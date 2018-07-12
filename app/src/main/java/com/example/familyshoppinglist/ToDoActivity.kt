@@ -394,9 +394,9 @@ class ToDoActivity : Activity() {
     private fun createAndShowDialog(exception: Exception, title: String) {
         var ex: Throwable = exception
         if (exception.cause != null) {
-            ex = exception.cause
+            ex = exception.cause!!
         }
-        createAndShowDialog(ex.message, title)
+        createAndShowDialog(ex.message!!, title)
     }
 
     /**

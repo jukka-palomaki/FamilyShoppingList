@@ -38,7 +38,7 @@ class ToDoItemAdapter(
 
         row!!.tag = currentItem
         val checkBox = row.findViewById(R.id.checkToDoItem) as CheckBox
-        checkBox.text = currentItem!!.text
+        checkBox.text = currentItem!!.text.trim()
         checkBox.isChecked = false
         checkBox.isEnabled = true
 
