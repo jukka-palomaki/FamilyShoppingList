@@ -1,3 +1,4 @@
+
 package com.example.familyshoppinglist;
 
 
@@ -40,7 +41,6 @@ import com.microsoft.windowsazure.mobileservices.table.sync.localstore.MobileSer
 import com.microsoft.windowsazure.mobileservices.table.sync.localstore.SQLiteLocalStore;
 import com.microsoft.windowsazure.mobileservices.table.sync.synchandler.SimpleSyncHandler;
 import com.squareup.okhttp.OkHttpClient;
-
 import static com.microsoft.windowsazure.mobileservices.table.query.QueryOperations.*;
 
 public class ToDoActivity extends Activity {
