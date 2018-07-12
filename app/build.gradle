@@ -23,11 +23,11 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.google.code.gson:gson:2.3'
-    compile 'com.google.guava:guava:18.0'
-    compile 'com.squareup.okhttp:okhttp:2.5.0'
-    compile 'com.microsoft.azure:azure-mobile-android:3.2.0@aar'
-    compile 'com.microsoft.azure:azure-notifications-handler:1.0.1@jar'
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.google.code.gson:gson:2.3'
+    implementation 'com.google.guava:guava:18.0'
+    implementation 'com.squareup.okhttp:okhttp:2.5.0'
+    implementation 'com.microsoft.azure:azure-mobile-android:3.2.0@aar'
+    implementation 'com.microsoft.azure:azure-notifications-handler:1.0.1@jar'
 }
 
