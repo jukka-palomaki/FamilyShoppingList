@@ -211,6 +211,7 @@ class ToDoActivity : Activity() {
 
         item.text = mTextNewToDo!!.text.toString()
         item.isComplete = false
+        item.userId = "userX"
 
         // Insert the new item
         val task = object : AsyncTask<Void, Void, Void>() {
