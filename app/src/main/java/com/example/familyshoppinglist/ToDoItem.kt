@@ -48,6 +48,21 @@ class ToDoItem {
     var isComplete: Boolean = false
 
     /**
+     * userId
+     */
+    /**
+     * Returns the item userId
+     */
+    /**
+     * Sets the item userId
+     *
+     * @param userId
+     * userId to set
+     */
+    @com.google.gson.annotations.SerializedName("userId")
+    var userId: String = ""
+
+    /**
      * ToDoItem constructor
      */
     constructor() {
