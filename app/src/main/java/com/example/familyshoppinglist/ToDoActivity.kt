@@ -226,7 +226,11 @@ class ToDoActivity : Activity() {
 
         item.text = mTextNewToDo!!.text.toString()
         item.isComplete = false
-        item.userId = "userX"
+
+        val prefs = getSharedPreferences(SHAREDPREFFILE, Context.MODE_PRIVATE)
+
+        item.userId = prefs.getString(USERIDPREF, null)
+
 
         // Insert the new item
         val task = object : AsyncTask<Void, Void, Void>() {
