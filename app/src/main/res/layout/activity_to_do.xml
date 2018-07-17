@@ -12,14 +12,6 @@
         android:background="#71BCFA"
         android:padding="6dip" >
 
-        <TextView
-            android:id="@+id/textViewTitle"
-            android:layout_width="0dip"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="2dp"
-            android:layout_weight="0.12"
-            android:text="@string/service_title"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
         <Button
             android:id="@+id/buttonAddToD"
             android:layout_width="64dip"
@@ -27,6 +19,15 @@
             android:onClick="logout"
             android:textSize="10dp"
             android:text="@string/logout_button_text" />
+
+        <TextView
+            android:id="@+id/textViewTitle"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="2dp"
+            android:layout_weight="0.12"
+            android:text=""
+            android:textAppearance="?android:attr/textAppearanceLarge" />
 
         <ProgressBar
             android:id="@+id/loadingProgressBar"
