@@ -40,12 +40,23 @@ import com.microsoft.windowsazure.mobileservices.table.sync.synchandler.SimpleSy
 import com.squareup.okhttp.OkHttpClient
 import com.microsoft.windowsazure.mobileservices.table.query.QueryOperations.*
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import android.content.Context
+import android.content.Intent
+import android.content.SharedPreferences
+import android.content.SharedPreferences.Editor
+
+import com.microsoft.windowsazure.mobileservices.authentication.MobileServiceAuthenticationProvider;
+import com.microsoft.windowsazure.mobileservices.authentication.MobileServiceUser;
+
 class ToDoActivity : Activity() {
 
     /**
      * Mobile Service Client reference
      */
     private var mClient: MobileServiceClient? = null
+
 
     /**
      * Mobile Service Table used to access data
@@ -101,6 +112,8 @@ class ToDoActivity : Activity() {
                 client
             }
 
+            authenticate()
+
             // Get the Mobile Service Table instance to use
 
             mToDoTable = mClient!!.getTable(ToDoItem::class.java)
@@ -124,7 +137,7 @@ class ToDoActivity : Activity() {
         } catch (e: MalformedURLException) {
             createAndShowDialog(Exception("There was an error creating the Mobile Service. Verify the URL"), "Error")
         } catch (e: Exception) {
-            createAndShowDialog(e, "Error")
+            createAndShowDialog(e, "Error onCreate")
         }
 
     }
@@ -147,6 +160,8 @@ class ToDoActivity : Activity() {
 
         return true
     }
+
+
 
     /**
      * Mark an item as completed
@@ -173,7 +188,7 @@ class ToDoActivity : Activity() {
                         }
                     }
                 } catch (e: Exception) {
-                    createAndShowDialogFromTask(e, "Error")
+                    createAndShowDialogFromTask(e, "Error checkItem")
                 }
 
                 return null
@@ -225,7 +240,7 @@ class ToDoActivity : Activity() {
                         }
                     }
                 } catch (e: Exception) {
-                    createAndShowDialogFromTask(e, "Error")
+                    createAndShowDialogFromTask(e, "Error addItem")
                 }
 
                 return null
@@ -236,6 +251,8 @@ class ToDoActivity : Activity() {
 
         mTextNewToDo!!.setText("")
     }
+
+
 
     /**
      * Add an item to the Mobile Service Table
@@ -273,7 +290,7 @@ class ToDoActivity : Activity() {
                         }
                     }
                 } catch (e: Exception) {
-                    createAndShowDialogFromTask(e, "Error")
+                    createAndShowDialogFromTask(e, "Error refreshItemsFromTable")
                 }
 
                 return null
@@ -337,7 +354,7 @@ class ToDoActivity : Activity() {
                     syncContext.initialize(localStore, handler).get()
 
                 } catch (e: Exception) {
-                    createAndShowDialogFromTask(e, "Error")
+                    createAndShowDialogFromTask(e, "Error initLocalStore")
                 }
 
                 return null
@@ -362,7 +379,7 @@ class ToDoActivity : Activity() {
                     syncContext.push().get();
                     mToDoTable.pull(null).get();
                 } catch (final Exception e) {
-                    createAndShowDialogFromTask(e, "Error");
+                    createAndShowDialogFromTask(e, "Error AsyncTask");
                 }
                 return null;
             }
@@ -380,7 +397,7 @@ class ToDoActivity : Activity() {
      * The dialog title
      */
     private fun createAndShowDialogFromTask(exception: Exception, title: String) {
-        runOnUiThread { createAndShowDialog(exception, "Error") }
+        runOnUiThread { createAndShowDialog(exception, "Error createAndShowDialogFromTask") }
     }
 
 
@@ -455,4 +472,105 @@ class ToDoActivity : Activity() {
             return resultFuture
         }
     }
+
+
+    private fun createTable() {
+
+        // Get the table instance to use.
+        mToDoTable = mClient!!.getTable(ToDoItem::class.java)
+
+        mTextNewToDo = findViewById(R.id.textNewToDo) as EditText
+
+        // Create an adapter to bind the items with the view.
+        mAdapter = ToDoItemAdapter(this, R.layout.row_list_to_do)
+        val listViewToDo = findViewById(R.id.listViewToDo) as ListView
+        listViewToDo.adapter = mAdapter
+
+        // Load the items from Azure.
+        refreshItemsFromTable()
+    }
+
+    //val SHAREDPREFFILE = "temp"
+    //val USERIDPREF = "uid"
+    //val TOKENPREF = "tkn"
+
+    private fun cacheUserToken(user: MobileServiceUser) {
+        val prefs = getSharedPreferences(SHAREDPREFFILE, Context.MODE_PRIVATE)
+        val editor = prefs.edit()
+        editor.putString(USERIDPREF, user.userId)
+        editor.putString(TOKENPREF, user.authenticationToken)
+        editor.commit()
+    }
+
+    private fun loadUserTokenCache(client: MobileServiceClient?): Boolean {
+        val prefs = getSharedPreferences(SHAREDPREFFILE, Context.MODE_PRIVATE)
+        val userId = prefs.getString(USERIDPREF, null) ?: return false
+        val token = prefs.getString(TOKENPREF, null) ?: return false
+
+        val user = MobileServiceUser(userId)
+        user.authenticationToken = token
+        client!!.currentUser = user
+
+        return true
+    }
+
+
+
+    fun logout(view: View) {
+        mClient!!.logout()
+
+        val prefs = getSharedPreferences(SHAREDPREFFILE, Context.MODE_PRIVATE)
+        val userId = prefs.getString(USERIDPREF, null) ?: return
+
+        val user = MobileServiceUser(userId)
+        user.authenticationToken = null
+
+        cacheUserToken(user)
+
+        mClient!!.login(MobileServiceAuthenticationProvider.Google, "familyshoppinglist", GOOGLE_LOGIN_REQUEST_CODE)
+    }
+
+    private fun authenticate() {
+        // We first try to load a token cache if one exists.
+        if (loadUserTokenCache(mClient)) {
+            createTable()
+        } else {
+            // Sign in using the Google provider.
+            mClient!!.login(MobileServiceAuthenticationProvider.Google, "familyshoppinglist", GOOGLE_LOGIN_REQUEST_CODE)
+        }// If we failed to load a token cache, sign in and create a token cache
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
+        // When request completes
+        if (resultCode == RESULT_OK) {
+            // Check the request code matches the one we send in the sign-in request
+            if (requestCode == GOOGLE_LOGIN_REQUEST_CODE) {
+                val result = mClient!!.onActivityResult(data)
+                if (result.isLoggedIn) {
+                    // sign-in succeeded
+                    createAndShowDialog(String.format("You are now signed in - %1$2s", mClient!!.currentUser.userId), "Success")
+                    cacheUserToken(mClient!!.currentUser)
+                    createTable()
+                } else {
+                    // sign-in failed, check the error message
+                    val errorMessage = result.errorMessage
+                    createAndShowDialog(errorMessage, "Erroria")
+                }
+            }
+        }
+    }
+
+    companion object {
+
+
+        // You can choose any unique number here to differentiate auth providers from each other. Note this is the same code at login() and onActivityResult().
+        val GOOGLE_LOGIN_REQUEST_CODE = 1
+
+
+        val SHAREDPREFFILE = "temp"
+        val USERIDPREF = "uid"
+        val TOKENPREF = "tkn"
+    }
+
+
 }
