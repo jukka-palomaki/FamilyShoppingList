@@ -559,7 +559,7 @@ class ToDoActivity : Activity() {
                 if (result.isLoggedIn) {
                     // sign-in succeeded
                     //createAndShowDialog(String.format("You are now signed in - %1$2s", mClient!!.currentUser.userId), "Success")
-                    Toast.makeText(this@ToDoActivity, "Login succeeded!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@ToDoActivity, "Login succeeded!", Toast.LENGTH_LONG).show()
                     cacheUserToken(mClient!!.currentUser)
                     createTable()
                 } else {
