@@ -46,6 +46,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.SharedPreferences.Editor
+import android.widget.Toast
+
 
 import com.microsoft.windowsazure.mobileservices.authentication.MobileServiceAuthenticationProvider;
 import com.microsoft.windowsazure.mobileservices.authentication.MobileServiceUser;
@@ -556,7 +558,8 @@ class ToDoActivity : Activity() {
                 val result = mClient!!.onActivityResult(data)
                 if (result.isLoggedIn) {
                     // sign-in succeeded
-                    createAndShowDialog(String.format("You are now signed in - %1$2s", mClient!!.currentUser.userId), "Success")
+                    //createAndShowDialog(String.format("You are now signed in - %1$2s", mClient!!.currentUser.userId), "Success")
+                    Toast.makeText(this@ToDoActivity, "Login succeeded!", Toast.LENGTH_SHORT).show()
                     cacheUserToken(mClient!!.currentUser)
                     createTable()
                 } else {
