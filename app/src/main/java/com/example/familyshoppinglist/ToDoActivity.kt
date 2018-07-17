@@ -225,6 +225,9 @@ class ToDoActivity : Activity() {
         val item = ToDoItem()
 
         item.text = mTextNewToDo!!.text.toString()
+        if (item.text.isNullOrEmpty()) {
+            return
+        }
         item.isComplete = false
 
         val prefs = getSharedPreferences(SHAREDPREFFILE, Context.MODE_PRIVATE)
