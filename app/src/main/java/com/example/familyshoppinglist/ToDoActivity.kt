@@ -225,7 +225,8 @@ class ToDoActivity : Activity() {
         val item = ToDoItem()
 
         item.text = mTextNewToDo!!.text.toString()
-        if (item.text.isNullOrEmpty()) {
+        if (item.text.trim().isEmpty()) {
+            createAndShowDialog("Cannot add empty item","Error")
             return
         }
         item.isComplete = false
