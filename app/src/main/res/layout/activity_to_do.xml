@@ -20,6 +20,13 @@
             android:layout_weight="0.12"
             android:text="@string/service_title"
             android:textAppearance="?android:attr/textAppearanceLarge" />
+        <Button
+            android:id="@+id/buttonAddToD"
+            android:layout_width="64dip"
+            android:layout_height="30dp"
+            android:onClick="logout"
+            android:textSize="10dp"
+            android:text="@string/logout_button_text" />
 
         <ProgressBar
             android:id="@+id/loadingProgressBar"
