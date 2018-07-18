@@ -3,6 +3,7 @@
     <string name="app_name">Family Shopping List</string>
     <string name="add_textbox_hint">Add a shopping item</string>
     <string name="add_button_text">Add</string>
+    <string name="login_button_text">Continue with Google</string>
     <string name="logout_button_text">Logout</string>
     <string name="service_title">Your Family Shopping List</string>
     <string name="menu_refresh">Refresh</string>

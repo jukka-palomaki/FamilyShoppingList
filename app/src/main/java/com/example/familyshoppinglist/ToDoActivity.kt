@@ -133,8 +133,6 @@ class ToDoActivity : Activity() {
             val listViewToDo = findViewById(R.id.listViewToDo) as ListView
             listViewToDo.adapter = mAdapter
 
-            // Load the items from the Mobile Service
-            refreshItemsFromTable()
 
         } catch (e: MalformedURLException) {
             createAndShowDialog(Exception("There was an error creating the Mobile Service. Verify the URL"), "Error")
@@ -407,7 +405,7 @@ class ToDoActivity : Activity() {
      * The dialog title
      */
     private fun createAndShowDialogFromTask(exception: Exception, title: String) {
-        runOnUiThread { createAndShowDialog(exception, "Error createAndShowDialogFromTask") }
+        runOnUiThread { createAndShowDialog(exception, title) }
     }
 
 
@@ -537,7 +535,9 @@ class ToDoActivity : Activity() {
 
         cacheUserToken(user)
 
-        mClient!!.login(MobileServiceAuthenticationProvider.Google, "familyshoppinglist", GOOGLE_LOGIN_REQUEST_CODE)
+        val intent = Intent(this, SignInActivity::class.java)
+        startActivity(intent);
+        finish()
     }
 
     private fun authenticate() {
@@ -568,6 +568,10 @@ class ToDoActivity : Activity() {
                     createAndShowDialog(errorMessage, "Erroria")
                 }
             }
+        } else {
+            val intent = Intent(this, SignInActivity::class.java)
+            startActivity(intent)
+            finish()
         }
     }
 
