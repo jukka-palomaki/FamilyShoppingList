@@ -57,7 +57,10 @@ class ToDoActivity : Activity() {
     /**
      * Mobile Service Client reference
      */
-    private var mClient: MobileServiceClient? = null
+    private val mClient: MobileServiceClient =             // Mobile Service URL and key
+            MobileServiceClient(
+                    "https://familyshoppinglist.azurewebsites.net",
+                    this).withFilter(ProgressFilter())
 
 
     /**
@@ -102,12 +105,12 @@ class ToDoActivity : Activity() {
             // Create the Mobile Service Client instance, using the provided
 
             // Mobile Service URL and key
-            mClient = MobileServiceClient(
-                    "https://familyshoppinglist.azurewebsites.net",
-                    this).withFilter(ProgressFilter())
+            //mClient = MobileServiceClient(
+              //      "https://familyshoppinglist.azurewebsites.net",
+                //    this).withFilter(ProgressFilter())
 
             // Extend timeout from default of 10s to 20s
-            mClient!!.setAndroidHttpClientFactory {
+            mClient.setAndroidHttpClientFactory {
                 val client = OkHttpClient()
                 client.setReadTimeout(20, TimeUnit.SECONDS)
                 client.setWriteTimeout(20, TimeUnit.SECONDS)
@@ -118,7 +121,7 @@ class ToDoActivity : Activity() {
 
             // Get the Mobile Service Table instance to use
 
-            mToDoTable = mClient!!.getTable(ToDoItem::class.java)
+            mToDoTable = mClient.getTable(ToDoItem::class.java)
 
             // Offline Sync
             //mToDoTable = mClient.getSyncTable("ToDoItem", ToDoItem.class);
@@ -343,12 +346,12 @@ class ToDoActivity : Activity() {
             override fun doInBackground(vararg params: Void): Void? {
                 try {
 
-                    val syncContext = mClient!!.syncContext
+                    val syncContext = mClient.syncContext
 
                     if (syncContext.isInitialized)
                         return null
 
-                    val localStore = SQLiteLocalStore(mClient!!.context, "OfflineStore", null, 1)
+                    val localStore = SQLiteLocalStore(mClient.context, "OfflineStore", null, 1)
 
                     val tableDefinition = HashMap<String, ColumnDataType>()
                     tableDefinition["id"] = ColumnDataType.String
@@ -485,7 +488,7 @@ class ToDoActivity : Activity() {
     private fun createTable() {
 
         // Get the table instance to use.
-        mToDoTable = mClient!!.getTable(ToDoItem::class.java)
+        mToDoTable = mClient.getTable(ToDoItem::class.java)
 
         mTextNewToDo = findViewById(R.id.textNewToDo) as EditText
 
@@ -498,10 +501,6 @@ class ToDoActivity : Activity() {
         refreshItemsFromTable()
     }
 
-    //val SHAREDPREFFILE = "temp"
-    //val USERIDPREF = "uid"
-    //val TOKENPREF = "tkn"
-
     private fun cacheUserToken(user: MobileServiceUser) {
         val prefs = getSharedPreferences(SHAREDPREFFILE, Context.MODE_PRIVATE)
         val editor = prefs.edit()
@@ -510,14 +509,14 @@ class ToDoActivity : Activity() {
         editor.commit()
     }
 
-    private fun loadUserTokenCache(client: MobileServiceClient?): Boolean {
+    private fun loadUserTokenCache(client: MobileServiceClient): Boolean {
         val prefs = getSharedPreferences(SHAREDPREFFILE, Context.MODE_PRIVATE)
         val userId = prefs.getString(USERIDPREF, null) ?: return false
         val token = prefs.getString(TOKENPREF, null) ?: return false
 
         val user = MobileServiceUser(userId)
         user.authenticationToken = token
-        client!!.currentUser = user
+        client.currentUser = user
 
         return true
     }
@@ -525,7 +524,7 @@ class ToDoActivity : Activity() {
 
 
     fun logout(view: View) {
-        mClient!!.logout()
+        mClient.logout()
 
         val prefs = getSharedPreferences(SHAREDPREFFILE, Context.MODE_PRIVATE)
         val userId = prefs.getString(USERIDPREF, null) ?: return
@@ -546,7 +545,7 @@ class ToDoActivity : Activity() {
             createTable()
         } else {
             // Sign in using the Google provider.
-            mClient!!.login(MobileServiceAuthenticationProvider.Google, "familyshoppinglist", GOOGLE_LOGIN_REQUEST_CODE)
+            mClient.login(MobileServiceAuthenticationProvider.Google, "familyshoppinglist", GOOGLE_LOGIN_REQUEST_CODE)
         }// If we failed to load a token cache, sign in and create a token cache
     }
 
@@ -555,12 +554,11 @@ class ToDoActivity : Activity() {
         if (resultCode == RESULT_OK) {
             // Check the request code matches the one we send in the sign-in request
             if (requestCode == GOOGLE_LOGIN_REQUEST_CODE) {
-                val result = mClient!!.onActivityResult(data)
+                val result = mClient.onActivityResult(data)
                 if (result.isLoggedIn) {
                     // sign-in succeeded
-                    //createAndShowDialog(String.format("You are now signed in - %1$2s", mClient!!.currentUser.userId), "Success")
                     Toast.makeText(this@ToDoActivity, "Login succeeded!", Toast.LENGTH_LONG).show()
-                    cacheUserToken(mClient!!.currentUser)
+                    cacheUserToken(mClient.currentUser)
                     createTable()
                 } else {
                     // sign-in failed, check the error message
