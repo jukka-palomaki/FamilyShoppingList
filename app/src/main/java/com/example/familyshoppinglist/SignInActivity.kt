@@ -47,14 +47,14 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.content.SharedPreferences.Editor
 import android.widget.Toast
+import com.example.familyshoppinglist.ToDoActivity.Companion.extraFromSignIn
 
 
 import com.microsoft.windowsazure.mobileservices.authentication.MobileServiceAuthenticationProvider;
 import com.microsoft.windowsazure.mobileservices.authentication.MobileServiceUser;
 
+
 class SignInActivity : Activity() {
-
-
 
 
     /**
@@ -78,56 +78,11 @@ class SignInActivity : Activity() {
 
     fun signIn(view: View) {
         val intent = Intent(this, ToDoActivity::class.java)
+        intent.putExtra(extraFromSignIn, true)
         startActivity(intent)
         finish()
 
     }
-
-
-
-/*
-    private fun authenticate() {
-        // We first try to load a token cache if one exists.
-        if (loadUserTokenCache(mClient)) {
-            createTable()
-        } else {
-            // Sign in using the Google provider.
-            mClient!!.login(MobileServiceAuthenticationProvider.Google, "familyshoppinglist", GOOGLE_LOGIN_REQUEST_CODE)
-        }// If we failed to load a token cache, sign in and create a token cache
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
-        // When request completes
-        if (resultCode == RESULT_OK) {
-            // Check the request code matches the one we send in the sign-in request
-            if (requestCode == GOOGLE_LOGIN_REQUEST_CODE) {
-                val result = mClient!!.onActivityResult(data)
-                if (result.isLoggedIn) {
-                    // sign-in succeeded
-                    //createAndShowDialog(String.format("You are now signed in - %1$2s", mClient!!.currentUser.userId), "Success")
-                    Toast.makeText(this@SignInActivity, "Login succeeded!", Toast.LENGTH_LONG).show()
-                    cacheUserToken(mClient!!.currentUser)
-                    createTable()
-                } else {
-                    // sign-in failed, check the error message
-                    val errorMessage = result.errorMessage
-                    createAndShowDialog(errorMessage, "Erroria")
-                }
-            }
-        }
-    }
-
-    companion object {
-
-
-        // You can choose any unique number here to differentiate auth providers from each other. Note this is the same code at login() and onActivityResult().
-        val GOOGLE_LOGIN_REQUEST_CODE = 1
-
-
-        val SHAREDPREFFILE = "temp"
-        val USERIDPREF = "uid"
-        val TOKENPREF = "tkn"
-    }*/
 
 
 }

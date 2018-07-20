@@ -89,6 +89,10 @@ class ToDoActivity : Activity() {
      */
     private var mProgressBar: ProgressBar? = null
 
+
+
+
+
     /**
      * Initializes the activity
      */
@@ -101,13 +105,8 @@ class ToDoActivity : Activity() {
         // Initialize the progress bar
         mProgressBar!!.visibility = ProgressBar.GONE
 
-        try {
-            // Create the Mobile Service Client instance, using the provided
 
-            // Mobile Service URL and key
-            //mClient = MobileServiceClient(
-              //      "https://familyshoppinglist.azurewebsites.net",
-                //    this).withFilter(ProgressFilter())
+        try {
 
             // Extend timeout from default of 10s to 20s
             mClient.setAndroidHttpClientFactory {
@@ -145,8 +144,16 @@ class ToDoActivity : Activity() {
 
     }
 
+    private fun gotoLogin() {
+        val intent = Intent(this, SignInActivity::class.java)
+        startActivity(intent);
+        finish()
+    }
+
+
     /**
-     * Initializes the activity menu
+     *
+     *  Initializes the activity menu
      */
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.activity_main, menu)
@@ -525,6 +532,9 @@ class ToDoActivity : Activity() {
 
     fun logout(view: View) {
         mClient.logout()
+        mClient.currentUser.userId = null
+        mClient.currentUser.authenticationToken = null
+
 
         val prefs = getSharedPreferences(SHAREDPREFFILE, Context.MODE_PRIVATE)
         val userId = prefs.getString(USERIDPREF, null) ?: return
@@ -533,10 +543,7 @@ class ToDoActivity : Activity() {
         user.authenticationToken = null
 
         cacheUserToken(user)
-
-        val intent = Intent(this, SignInActivity::class.java)
-        startActivity(intent);
-        finish()
+        gotoLogin()
     }
 
     private fun authenticate() {
@@ -544,7 +551,9 @@ class ToDoActivity : Activity() {
         if (loadUserTokenCache(mClient)) {
             createTable()
         } else {
+
             // Sign in using the Google provider.
+            //gotoLogin()
             mClient.login(MobileServiceAuthenticationProvider.Google, "familyshoppinglist", GOOGLE_LOGIN_REQUEST_CODE)
         }// If we failed to load a token cache, sign in and create a token cache
     }
@@ -567,9 +576,7 @@ class ToDoActivity : Activity() {
                 }
             }
         } else {
-            val intent = Intent(this, SignInActivity::class.java)
-            startActivity(intent)
-            finish()
+            gotoLogin()
         }
     }
 
@@ -583,6 +590,8 @@ class ToDoActivity : Activity() {
         val SHAREDPREFFILE = "temp"
         val USERIDPREF = "uid"
         val TOKENPREF = "tkn"
+
+        val extraFromSignIn = "fromSignIn"
     }
 
 
