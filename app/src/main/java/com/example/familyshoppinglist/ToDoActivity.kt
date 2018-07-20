@@ -59,7 +59,7 @@ class ToDoActivity : Activity() {
      * Create the Mobile Service Client instance, using the provided
      * Mobile Service URL and key
      */
-    private var mClient = MobileServiceClient(
+    private val mClient = MobileServiceClient(
     "https://familyshoppinglist.azurewebsites.net",
     this).withFilter(ProgressFilter())
 
@@ -67,7 +67,7 @@ class ToDoActivity : Activity() {
     /**
      * Mobile Service Table used to access data
      */
-    private var mToDoTable: MobileServiceTable<ToDoItem>? = null
+    private var mToDoTable: MobileServiceTable<ToDoItem> = mClient.getTable(ToDoItem::class.java)
 
     //Offline Sync
     /**
@@ -117,7 +117,7 @@ class ToDoActivity : Activity() {
 
             // Get the Mobile Service Table instance to use
 
-            mToDoTable = mClient.getTable(ToDoItem::class.java)
+            //mToDoTable = mClient.getTable(ToDoItem::class.java)
 
             // Offline Sync
             //mToDoTable = mClient.getSyncTable("ToDoItem", ToDoItem.class);
@@ -208,7 +208,7 @@ class ToDoActivity : Activity() {
      */
     @Throws(ExecutionException::class, InterruptedException::class)
     fun checkItemInTable(item: ToDoItem) {
-        mToDoTable!!.update(item).get()
+        mToDoTable.update(item).get()
     }
 
     /**
@@ -271,7 +271,7 @@ class ToDoActivity : Activity() {
      */
     @Throws(ExecutionException::class, InterruptedException::class)
     fun addItemInTable(item: ToDoItem): ToDoItem {
-        return mToDoTable!!.insert(item).get()
+        return mToDoTable.insert(item).get()
     }
 
     /**
@@ -315,7 +315,7 @@ class ToDoActivity : Activity() {
 
     @Throws(ExecutionException::class, InterruptedException::class)
     private fun refreshItemsFromMobileServiceTable(): List<ToDoItem> {
-        return mToDoTable!!.where().field("complete").eq(`val`(false)).execute().get()
+        return mToDoTable.where().field("complete").eq(`val`(false)).execute().get()
     }
 
     //Offline Sync
