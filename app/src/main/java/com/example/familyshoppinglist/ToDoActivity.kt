@@ -315,6 +315,8 @@ class ToDoActivity : Activity() {
         val rows = mToDoTable.
                 where().field("complete").eq(`val`(false))
                        .and().field("userId").eq(`val`("sid:xxx"))
+                       .or().field("userId").eq(`val`("sid:yyy"))
+                       .or().field("userId").eq(`val`("sid:zzz"))
                 .execute().get()
         return rows
     }
