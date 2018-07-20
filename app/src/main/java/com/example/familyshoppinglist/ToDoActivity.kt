@@ -14,9 +14,6 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.EditText
-import android.widget.ListView
-import android.widget.ProgressBar
 
 import com.google.common.util.concurrent.FutureCallback
 import com.google.common.util.concurrent.Futures
@@ -24,15 +21,10 @@ import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.SettableFuture
 import com.microsoft.windowsazure.mobileservices.MobileServiceClient
 import com.microsoft.windowsazure.mobileservices.http.NextServiceFilterCallback
-import com.microsoft.windowsazure.mobileservices.http.OkHttpClientFactory
 import com.microsoft.windowsazure.mobileservices.http.ServiceFilter
 import com.microsoft.windowsazure.mobileservices.http.ServiceFilterRequest
 import com.microsoft.windowsazure.mobileservices.http.ServiceFilterResponse
 import com.microsoft.windowsazure.mobileservices.table.MobileServiceTable
-import com.microsoft.windowsazure.mobileservices.table.query.Query
-import com.microsoft.windowsazure.mobileservices.table.query.QueryOperations
-import com.microsoft.windowsazure.mobileservices.table.sync.MobileServiceSyncContext
-import com.microsoft.windowsazure.mobileservices.table.sync.MobileServiceSyncTable
 import com.microsoft.windowsazure.mobileservices.table.sync.localstore.ColumnDataType
 import com.microsoft.windowsazure.mobileservices.table.sync.localstore.MobileServiceLocalStoreException
 import com.microsoft.windowsazure.mobileservices.table.sync.localstore.SQLiteLocalStore
@@ -40,17 +32,15 @@ import com.microsoft.windowsazure.mobileservices.table.sync.synchandler.SimpleSy
 import com.squareup.okhttp.OkHttpClient
 import com.microsoft.windowsazure.mobileservices.table.query.QueryOperations.*
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
-import android.content.SharedPreferences.Editor
-import android.widget.Toast
+import android.widget.*
 
 
 import com.microsoft.windowsazure.mobileservices.authentication.MobileServiceAuthenticationProvider;
 import com.microsoft.windowsazure.mobileservices.authentication.MobileServiceUser;
+
+
 
 class ToDoActivity : Activity() {
 
@@ -90,6 +80,11 @@ class ToDoActivity : Activity() {
      */
     private var mProgressBar: ProgressBar? = null
 
+    private var mLogInOutButton: Button? = null;
+
+    private var mAddButton: Button? = null;
+
+
     /**
      * Initializes the activity
      */
@@ -98,6 +93,8 @@ class ToDoActivity : Activity() {
         setContentView(R.layout.activity_to_do)
 
         mProgressBar = findViewById(R.id.loadingProgressBar) as ProgressBar
+        mLogInOutButton = findViewById(R.id.buttonLogInOut) as Button
+        mAddButton = findViewById(R.id.buttonAddToDo) as Button
 
         // Initialize the progress bar
         mProgressBar!!.visibility = ProgressBar.GONE
@@ -499,9 +496,6 @@ class ToDoActivity : Activity() {
         refreshItemsFromTable()
     }
 
-    //val SHAREDPREFFILE = "temp"
-    //val USERIDPREF = "uid"
-    //val TOKENPREF = "tkn"
 
     private fun cacheUserToken(user: MobileServiceUser) {
         val prefs = getSharedPreferences(SHAREDPREFFILE, Context.MODE_PRIVATE)
@@ -524,19 +518,26 @@ class ToDoActivity : Activity() {
     }
 
 
+    fun loginLogout(view: View) {
 
-    fun logout(view: View) {
-        mClient.logout()
+        if (view is Button && !mClient.isLoginInProgress) {
+            if (mAdapter!!.isEmpty()) {
+                // Sign in using the Google provider.
+                mClient.login(MobileServiceAuthenticationProvider.Google, "familyshoppinglist", GOOGLE_LOGIN_REQUEST_CODE)
+                mAddButton!!.isEnabled = true
+            } else {
+                val prefs = getSharedPreferences(SHAREDPREFFILE, Context.MODE_PRIVATE)
+                val userId = prefs.getString(USERIDPREF, null) ?: return
+                val user = MobileServiceUser(userId)
+                user.authenticationToken = null
+                cacheUserToken(user)
+                mClient.logout()
+                mAdapter!!.clear()
+                Toast.makeText(this@ToDoActivity, "Logged out", Toast.LENGTH_LONG).show()
+                mAddButton!!.isEnabled = false
 
-        val prefs = getSharedPreferences(SHAREDPREFFILE, Context.MODE_PRIVATE)
-        val userId = prefs.getString(USERIDPREF, null) ?: return
-
-        val user = MobileServiceUser(userId)
-        user.authenticationToken = null
-
-        cacheUserToken(user)
-
-        mClient.login(MobileServiceAuthenticationProvider.Google, "familyshoppinglist", GOOGLE_LOGIN_REQUEST_CODE)
+            }
+        }
     }
 
     private fun authenticate() {
@@ -544,9 +545,11 @@ class ToDoActivity : Activity() {
         if (loadUserTokenCache(mClient)) {
             createTable()
         } else {
-            // Sign in using the Google provider.
-            mClient.login(MobileServiceAuthenticationProvider.Google, "familyshoppinglist", GOOGLE_LOGIN_REQUEST_CODE)
-        }// If we failed to load a token cache, sign in and create a token cache
+            //Else we show an empty table with login button
+            if (mAdapter != null) {
+                mAdapter!!.clear()
+            }
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
@@ -557,7 +560,6 @@ class ToDoActivity : Activity() {
                 val result = mClient.onActivityResult(data)
                 if (result.isLoggedIn) {
                     // sign-in succeeded
-                    //createAndShowDialog(String.format("You are now signed in - %1$2s", mClient.currentUser.userId), "Success")
                     Toast.makeText(this@ToDoActivity, "Login succeeded!", Toast.LENGTH_LONG).show()
                     cacheUserToken(mClient.currentUser)
                     createTable()
