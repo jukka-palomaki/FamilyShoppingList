@@ -82,6 +82,9 @@ class ToDoActivity : Activity() {
 
     private var mLogInOutButton: Button? = null;
 
+    private var mAddButton: Button? = null;
+
+
     /**
      * Initializes the activity
      */
@@ -91,6 +94,7 @@ class ToDoActivity : Activity() {
 
         mProgressBar = findViewById(R.id.loadingProgressBar) as ProgressBar
         mLogInOutButton = findViewById(R.id.buttonLogInOut) as Button
+        mAddButton = findViewById(R.id.buttonAddToDo) as Button
 
         // Initialize the progress bar
         mProgressBar!!.visibility = ProgressBar.GONE
@@ -520,6 +524,7 @@ class ToDoActivity : Activity() {
             if (mAdapter!!.isEmpty()) {
                 // Sign in using the Google provider.
                 mClient.login(MobileServiceAuthenticationProvider.Google, "familyshoppinglist", GOOGLE_LOGIN_REQUEST_CODE)
+                mAddButton!!.isEnabled = true
             } else {
                 val prefs = getSharedPreferences(SHAREDPREFFILE, Context.MODE_PRIVATE)
                 val userId = prefs.getString(USERIDPREF, null) ?: return
@@ -529,11 +534,10 @@ class ToDoActivity : Activity() {
                 mClient.logout()
                 mAdapter!!.clear()
                 Toast.makeText(this@ToDoActivity, "Logged out", Toast.LENGTH_LONG).show()
+                mAddButton!!.isEnabled = false
 
             }
         }
-
-
     }
 
     private fun authenticate() {
