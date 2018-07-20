@@ -312,7 +312,11 @@ class ToDoActivity : Activity() {
 
     @Throws(ExecutionException::class, InterruptedException::class)
     private fun refreshItemsFromMobileServiceTable(): List<ToDoItem> {
-        return mToDoTable.where().field("complete").eq(`val`(false)).execute().get()
+        val rows = mToDoTable.
+                where().field("complete").eq(`val`(false))
+                       .and().field("userId").eq(`val`("sid:xxx"))
+                .execute().get()
+        return rows
     }
 
     //Offline Sync
