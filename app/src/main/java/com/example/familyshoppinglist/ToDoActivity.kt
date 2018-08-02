@@ -84,6 +84,8 @@ class ToDoActivity : Activity() {
 
     private var mAddButton: Button? = null;
 
+    private var userId = ""
+
 
     /**
      * Initializes the activity
@@ -229,9 +231,9 @@ class ToDoActivity : Activity() {
         }
         item.isComplete = false
 
-        val prefs = getSharedPreferences(SHAREDPREFFILE, Context.MODE_PRIVATE)
+        //val prefs = getSharedPreferences(SHAREDPREFFILE, Context.MODE_PRIVATE)
 
-        item.userId = prefs.getString(USERIDPREF, null)
+        item.userId = userId //prefs.getString(USERIDPREF, null)
 
 
         // Insert the new item
@@ -312,9 +314,11 @@ class ToDoActivity : Activity() {
 
     @Throws(ExecutionException::class, InterruptedException::class)
     private fun refreshItemsFromMobileServiceTable(): List<ToDoItem> {
+
         val rows = mToDoTable.
-                where().field("complete").eq(`val`(false))
-                       .and().field("userId").eq(`val`("sid:xxx"))
+                where().field("complete").eq(`val`(false)).and().field("userId").eq(`val`(sid1))
+                .or().field("complete").eq(`val`(false)).and().field("userId").eq(`val`(sid2))
+                .or().field("complete").eq(`val`(false)).and().field("userId").eq(`val`(sid3))
                 .execute().get()
         return rows
     }
@@ -505,13 +509,14 @@ class ToDoActivity : Activity() {
         val prefs = getSharedPreferences(SHAREDPREFFILE, Context.MODE_PRIVATE)
         val editor = prefs.edit()
         editor.putString(USERIDPREF, user.userId)
+        userId = user.userId
         editor.putString(TOKENPREF, user.authenticationToken)
         editor.commit()
     }
 
     private fun loadUserTokenCache(client: MobileServiceClient?): Boolean {
         val prefs = getSharedPreferences(SHAREDPREFFILE, Context.MODE_PRIVATE)
-        val userId = prefs.getString(USERIDPREF, null) ?: return false
+        userId = prefs.getString(USERIDPREF, "") ?: return false
         val token = prefs.getString(TOKENPREF, null) ?: return false
 
         val user = MobileServiceUser(userId)
@@ -531,7 +536,7 @@ class ToDoActivity : Activity() {
                 mAddButton!!.isEnabled = true
             } else {
                 val prefs = getSharedPreferences(SHAREDPREFFILE, Context.MODE_PRIVATE)
-                val userId = prefs.getString(USERIDPREF, null) ?: return
+                userId = prefs.getString(USERIDPREF, "") ?: return
                 val user = MobileServiceUser(userId)
                 user.authenticationToken = null
                 cacheUserToken(user)
@@ -556,20 +561,35 @@ class ToDoActivity : Activity() {
         }
     }
 
+    private val sid1 = "aaa"
+    private val sid2 = "bbb"
+    private val sid3 = "ccc"
+
+    private fun isAllowedUser(sid: String): Boolean {
+        when (sid) {
+            sid1, sid2, sid3 -> return true
+            else -> return false
+        }
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
         // When request completes
         if (resultCode == RESULT_OK) {
             // Check the request code matches the one we send in the sign-in request
             if (requestCode == GOOGLE_LOGIN_REQUEST_CODE) {
                 val result = mClient.onActivityResult(data)
-                if (result.isLoggedIn) {
+                if (result.isLoggedIn && isAllowedUser(mClient.currentUser.userId)) {
                     // sign-in succeeded
                     Toast.makeText(this@ToDoActivity, "Login succeeded!", Toast.LENGTH_LONG).show()
                     cacheUserToken(mClient.currentUser)
                     createTable()
                 } else {
                     // sign-in failed, check the error message
-                    val errorMessage = result.errorMessage
+                    mClient.logout()
+                    var errorMessage = result.errorMessage
+                    if (errorMessage == null) {
+                        errorMessage = "Not allowed user"
+                    }
                     createAndShowDialog(errorMessage, "Erroria")
                 }
             }
