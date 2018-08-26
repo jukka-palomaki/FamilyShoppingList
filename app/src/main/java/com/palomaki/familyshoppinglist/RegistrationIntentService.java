@@ -20,7 +20,7 @@ public class RegistrationIntentService extends IntentService {
 
 
     private final static String HubName = "FSLNotificationHub";
-    private final static String HubListenConnectionString = "<Enter your DefaultListenSharedAccessSignature connection string>";
+    private final static String HubListenConnectionString = "Endpoint=sb://fslnamespacepush.servicebus.windows.net/;SharedAccessKeyName=DefaultListenSharedAccessSignature;SharedAccessKey=TSlCKgVWFGnbAcBbQ46arSm2gnA+nc8YBCzCLUEwN9k=";
 
     @Override
     protected void onHandleIntent(Intent intent) {
