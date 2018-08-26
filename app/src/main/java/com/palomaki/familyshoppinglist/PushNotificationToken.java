@@ -1,5 +1,6 @@
 package com.palomaki.familyshoppinglist;
 
+import android.content.Intent;
 import android.util.Log;
 
 import com.google.firebase.iid.FirebaseInstanceId;
@@ -18,5 +19,10 @@ public class PushNotificationToken extends FirebaseInstanceIdService {
         // manage this apps subscriptions on the server side, send the
         // Instance ID token to your app server.
         //sendRegistrationToServer(refreshedToken);
+
+        Log.d(TAG, "Refreshing GCM Registration Token");
+
+        //Intent intent = new Intent(this, RegistrationIntentService.class);
+        //startService(intent);
     }
 }

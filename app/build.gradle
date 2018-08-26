@@ -4,7 +4,7 @@ android {
     compileSdkVersion 26
     buildToolsVersion '27.0.3'
     defaultConfig {
-        applicationId "com.example.zumoappname"
+        applicationId "com.palomaki.familyshoppinglist"
         minSdkVersion 26
         targetSdkVersion 26
         versionCode 1
@@ -28,16 +28,22 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.google.code.gson:gson:2.8.0'
     implementation 'com.google.guava:guava:22.0'
+    implementation 'com.google.android.gms:play-services-gcm:15.0.1'
+    implementation 'com.google.firebase:firebase-core:16.0.3'
+    implementation 'com.google.firebase:firebase-messaging:17.3.0'
+    implementation 'com.microsoft.azure:notification-hubs-android-sdk:0.4@aar'
+    implementation 'com.microsoft.azure:azure-notifications-handler:1.0.1@aar'
     implementation 'com.squareup.okhttp:okhttp:2.5.0'
     implementation 'com.microsoft.azure:azure-mobile-android:3.2.0@aar'
-    implementation 'com.microsoft.azure:azure-notifications-handler:1.0.1@jar'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'com.android.support:customtabs:26.0.0'
-    implementation 'com.android.support:appcompat-v7:27.1.1'
-    implementation 'com.google.firebase:firebase-messaging:11.8.0'
+    implementation 'com.android.support:customtabs:26.1.0'
+    implementation 'com.android.support:appcompat-v7:26.1.0'
+
 }
 repositories {
-    mavenCentral()
+    maven {
+        url "http://dl.bintray.com/microsoftazuremobile/SDK"
+    }
 }
 
 
