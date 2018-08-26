@@ -6,8 +6,8 @@ import android.util.Log;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdService;
 
-public class PushNotificationToken extends FirebaseInstanceIdService {
-    private static final String TAG = "PushNotificationToken";
+public class FslInstanceIDService extends FirebaseInstanceIdService {
+    private static final String TAG = "FslInstanceIDService";
 
     @Override
     public void onTokenRefresh() {
@@ -22,7 +22,7 @@ public class PushNotificationToken extends FirebaseInstanceIdService {
 
         Log.d(TAG, "Refreshing GCM Registration Token");
 
-        //Intent intent = new Intent(this, RegistrationIntentService.class);
-        //startService(intent);
+        Intent intent = new Intent(this, RegistrationIntentService.class);
+        startService(intent);
     }
 }
