@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.familyshoppinglist"
+    package="com.palomaki.familyshoppinglist"
     android:versionCode="1"
     android:versionName="1.0" >
 
@@ -15,7 +15,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
 
-        <activity android:name="ToDoActivity"
+        <activity android:name="com.palomaki.familyshoppinglist.ToDoActivity"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -32,6 +32,13 @@
                     android:host="easyauth.callback"/>
             </intent-filter>
         </activity>
+
+        <service
+            android:name="com.palomaki.familyshoppinglist.PushNotificationToken">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

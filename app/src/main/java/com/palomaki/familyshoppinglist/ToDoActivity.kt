@@ -1,4 +1,4 @@
-package com.example.familyshoppinglist
+package com.palomaki.familyshoppinglist
 
 
 import java.net.MalformedURLException
@@ -43,6 +43,8 @@ import com.microsoft.windowsazure.mobileservices.authentication.MobileServiceUse
 
 
 class ToDoActivity : Activity() {
+
+    private val TAG = "ToDoActivity";
 
     /**
      * Mobile Service Client reference
@@ -139,6 +141,20 @@ class ToDoActivity : Activity() {
         } catch (e: Exception) {
             createAndShowDialog(e, "Error onCreate")
         }
+
+        /*
+        FirebaseMessaging.getInstance().subscribeToTopic("firstFamily").addOnCompleteListener(object : OnCompleteListener<Void> {
+            override fun onComplete(task: Task<Void>) {
+                var msg = "Subscribed"//getString(R.string.msg_subscribed);
+                if (!task.isSuccessful) {
+                    msg = "Subscription failed"//getString(R.string.msg_subscribe_failed);
+                }
+                Log.d(TAG, msg)
+                Toast.makeText(this@ToDoActivity, msg, Toast.LENGTH_SHORT).show()
+            }
+        })
+*/
+
 
     }
 
@@ -561,7 +577,7 @@ class ToDoActivity : Activity() {
         }
     }
 
-    private val sid1 = "aaa"
+    private val sid1 = "xxx"
     private val sid2 = "bbb"
     private val sid3 = "ccc"
 
