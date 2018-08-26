@@ -2,8 +2,8 @@ package com.palomaki.familyshoppinglist
 
 object NotificationSettings {
 
-    var SenderId = "<Your project number>"
-    var HubName = "<Your HubName>"
-    var HubListenConnectionString = "<Enter your DefaultListenSharedAccessSignature connection string>"
+    val SenderId = "656626197250"
+    //val HubName = "FSLNotificationHub"
+    //val HubListenConnectionString = "<Enter your DefaultListenSharedAccessSignature connection string>"
 }
 

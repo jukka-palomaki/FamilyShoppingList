@@ -40,9 +40,20 @@ import android.widget.*
 import com.microsoft.windowsazure.mobileservices.authentication.MobileServiceAuthenticationProvider;
 import com.microsoft.windowsazure.mobileservices.authentication.MobileServiceUser;
 
+import com.google.android.gms.common.ConnectionResult
+import com.google.android.gms.common.GoogleApiAvailability
+import com.microsoft.windowsazure.notifications.NotificationsManager
+import android.util.Log
+import android.widget.TextView
+import android.widget.Toast
+
 
 
 class ToDoActivity : Activity() {
+
+    //var todoActivity: ToDoActivity? = null
+    //var static isVisible: Boolean? = false
+    private val PLAY_SERVICES_RESOLUTION_REQUEST = 9000
 
     private val TAG = "ToDoActivity";
 
@@ -95,6 +106,10 @@ class ToDoActivity : Activity() {
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_to_do)
+
+        MyHandler.todoActivity = this
+        NotificationsManager.handleNotifications(this, NotificationSettings.SenderId, MyHandler::class.java)
+        registerWithNotificationHubs()
 
         mProgressBar = findViewById(R.id.loadingProgressBar) as ProgressBar
         mLogInOutButton = findViewById(R.id.buttonLogInOut) as Button
@@ -156,6 +171,35 @@ class ToDoActivity : Activity() {
 */
 
 
+    }
+
+    override fun onStart() {
+        super.onStart()
+        MyHandler.isVisible = true
+    }
+
+    override fun onPause() {
+        super.onPause()
+        MyHandler.isVisible = false
+    }
+
+    override fun onResume() {
+        super.onResume()
+        MyHandler.isVisible = true
+    }
+
+    override fun onStop() {
+        super.onStop()
+        MyHandler.isVisible = false
+    }
+
+
+    fun ToastNotify(notificationMessage: String) {
+        runOnUiThread {
+            Toast.makeText(this@ToDoActivity, notificationMessage, Toast.LENGTH_LONG).show()
+            //val helloText = findViewById(R.id.text_hello) as TextView
+            //helloText.text = notificationMessage
+        }
     }
 
     /**
@@ -609,6 +653,36 @@ class ToDoActivity : Activity() {
                     createAndShowDialog(errorMessage, "Erroria")
                 }
             }
+        }
+    }
+
+    /**
+     * Check the device to make sure it has the Google Play Services APK. If
+     * it doesn't, display a dialog that allows users to download the APK from
+     * the Google Play Store or enable it in the device's system settings.
+     */
+    private fun checkPlayServices(): Boolean {
+        val apiAvailability = GoogleApiAvailability.getInstance()
+        val resultCode = apiAvailability.isGooglePlayServicesAvailable(this)
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (apiAvailability.isUserResolvableError(resultCode)) {
+                apiAvailability.getErrorDialog(this, resultCode, PLAY_SERVICES_RESOLUTION_REQUEST)
+                        .show()
+            } else {
+                Log.i(TAG, "This device is not supported by Google Play Services.")
+                Toast.makeText(this@ToDoActivity, "This device is not supported by Google Play Services", Toast.LENGTH_LONG).show()
+                finish()
+            }
+            return false
+        }
+        return true
+    }
+
+    fun registerWithNotificationHubs() {
+        if (checkPlayServices()) {
+            // Start IntentService to register this application with FCM.
+            val intent = Intent(this, RegistrationIntentService::class.java)
+            startService(intent)
         }
     }
 
