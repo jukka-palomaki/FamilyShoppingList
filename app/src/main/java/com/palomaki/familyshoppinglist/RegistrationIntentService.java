@@ -19,8 +19,6 @@ public class RegistrationIntentService extends IntentService {
     }
 
 
-    private final static String HubName = "FSLNotificationHub";
-    private final static String HubListenConnectionString = "Endpoint=sb://fslnamespacepush.servicebus.windows.net/;SharedAccessKeyName=DefaultListenSharedAccessSignature;SharedAccessKey=TSlCKgVWFGnbAcBbQ46arSm2gnA+nc8YBCzCLUEwN9k=";
 
     @Override
     protected void onHandleIntent(Intent intent) {
@@ -39,8 +37,8 @@ public class RegistrationIntentService extends IntentService {
             // otherwise your server should have already received the token.
             if (((regID=sharedPreferences.getString("registrationID", null)) == null)){
 
-                NotificationHub hub = new NotificationHub(HubName,
-                        HubListenConnectionString, this);
+                NotificationHub hub = new NotificationHub(NotificationSettings.INSTANCE.getHubName(),
+                        NotificationSettings.INSTANCE.getHubListenConnectionString(), this);
                 Log.d(TAG, "Attempting a new registration with NH using FCM token : " + FCM_token);
                 regID = hub.register(FCM_token).getRegistrationId();
 
@@ -58,8 +56,8 @@ public class RegistrationIntentService extends IntentService {
             // Check if the token may have been compromised and needs refreshing.
             else if ((storedToken=sharedPreferences.getString("FCMtoken", "")) != FCM_token) {
 
-                NotificationHub hub = new NotificationHub(HubName,
-                        HubListenConnectionString, this);
+                NotificationHub hub = new NotificationHub(NotificationSettings.INSTANCE.getHubName(),
+                        NotificationSettings.INSTANCE.getHubListenConnectionString(), this);
                 Log.d(TAG, "NH Registration refreshing with token : " + FCM_token);
                 regID = hub.register(FCM_token).getRegistrationId();
 

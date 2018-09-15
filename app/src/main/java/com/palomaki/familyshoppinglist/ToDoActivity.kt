@@ -15,6 +15,8 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 
+import android.widget.EditText;
+
 import com.google.common.util.concurrent.FutureCallback
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
@@ -46,16 +48,21 @@ import com.microsoft.windowsazure.notifications.NotificationsManager
 import android.util.Log
 import android.widget.TextView
 import android.widget.Toast
-
+import com.palomaki.familyshoppinglist.MyHandler.isVisible
 
 
 class ToDoActivity : Activity() {
+
 
     //var todoActivity: ToDoActivity? = null
     //var static isVisible: Boolean? = false
     private val PLAY_SERVICES_RESOLUTION_REQUEST = 9000
 
     private val TAG = "ToDoActivity";
+
+
+
+
 
     /**
      * Mobile Service Client reference
@@ -221,6 +228,9 @@ class ToDoActivity : Activity() {
         return true
     }
 
+    fun sendNotificationButtonOnClick(view: View) {
+        MyHandler.sendNotificationButtonOnClick(view)
+    }
 
 
     /**
@@ -330,6 +340,8 @@ class ToDoActivity : Activity() {
      */
     @Throws(ExecutionException::class, InterruptedException::class)
     fun addItemInTable(item: ToDoItem): ToDoItem {
+        val handler = MyHandler(this)
+        handler.sendNotification("Uusi ostos lisätty!")
         return mToDoTable.insert(item).get()
     }
 
@@ -621,7 +633,7 @@ class ToDoActivity : Activity() {
         }
     }
 
-    private val sid1 = "xxx"
+    private val sid1 = "sid:c73ef5f335bbcf97391c059148999447"
     private val sid2 = "bbb"
     private val sid3 = "ccc"
 
@@ -685,6 +697,9 @@ class ToDoActivity : Activity() {
             startService(intent)
         }
     }
+
+
+
 
     companion object {
 
