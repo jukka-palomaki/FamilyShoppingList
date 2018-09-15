@@ -686,6 +686,8 @@ class ToDoActivity : Activity() {
                 finish()
             }
             return false
+        } else {
+            Toast.makeText(this@ToDoActivity, "Google Play Services ok", Toast.LENGTH_SHORT).show()
         }
         return true
     }
