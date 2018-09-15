@@ -9,7 +9,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.util.Base64;
-import android.view.View;
 import android.widget.EditText;
 
 import com.microsoft.windowsazure.messaging.NotificationHub;
@@ -30,18 +29,18 @@ import javax.crypto.spec.SecretKeySpec;
 public class MyHandler extends NotificationsHandler {
     public static final int NOTIFICATION_ID = 1;
     private NotificationManager mNotificationManager;
-    NotificationCompat.Builder mBuilder;
-    Context ctx;
+    private NotificationCompat.Builder mBuilder;
+    private Context ctx;
 
-    private static String HubEndpoint = null;
-    private static String HubSasKeyName = null;
-    private static String HubSasKeyValue = null;
+    private String HubEndpoint = null;
+    private String HubSasKeyName = null;
+    private String HubSasKeyValue = null;
 
 
     private NotificationHub hub;
 
-    public static ToDoActivity todoActivity;
-    public static Boolean isVisible = false;
+    public ToDoActivity todoActivity;
+    public Boolean isVisible = false;
 
     public MyHandler(Context ctx) {
         this.ctx = ctx;
@@ -53,13 +52,13 @@ public class MyHandler extends NotificationsHandler {
         String nhMessage = bundle.getString("message");
         sendNotification(nhMessage);
         if (isVisible) {
-            todoActivity.ToastNotify(nhMessage);
+            todoActivity.ToastNotify(nhMessage, true);
         }
         super.onReceive(context, bundle);
     }
 
 
-    public void sendNotification(String msg) {
+    private void sendNotification(String msg) {
 
         Intent intent = new Intent(ctx, ToDoActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -83,11 +82,11 @@ public class MyHandler extends NotificationsHandler {
         mBuilder.setContentIntent(contentIntent);
         mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
 
-        todoActivity.ToastNotify(msg);
+        todoActivity.ToastNotify(msg, true);
     }
 
 
-    private static String generateSasToken(String uri) {
+    private String generateSasToken(String uri) {
 
         String targetUri;
         String token = null;
@@ -123,7 +122,7 @@ public class MyHandler extends NotificationsHandler {
                     + signature + "&se=" + expires + "&skn=" + HubSasKeyName;
         } catch (Exception e) {
             if (isVisible) {
-                todoActivity.ToastNotify("Exception Generating SaS : " + e.getMessage().toString());
+                todoActivity.ToastNotify("Exception Generating SaS : " + e.getMessage().toString(), true);
             }
         }
 
@@ -138,11 +137,11 @@ public class MyHandler extends NotificationsHandler {
      * notification hub. The text in the editTextNotificationMessage control
      * is added as the JSON body for the request to add a GCM message to the hub.
      *
-     * @param v
      */
-    public static void sendNotificationButtonOnClick(View v) {
+    public void sendNotificationButtonOnClick() {
         EditText notificationText = todoActivity.findViewById(R.id.editTextNotificationMessage);
         final String json = "{\"data\":{\"message\":\"" + notificationText.getText().toString() + "\"}}";
+        sendNotification(notificationText.getText().toString());
 
         new Thread()
         {
@@ -193,7 +192,7 @@ public class MyHandler extends NotificationsHandler {
                                 builder.append(line);
                             }
 
-                            todoActivity.ToastNotify(builder.toString());
+                            todoActivity.ToastNotify(builder.toString(), true);
                         }
                     } finally {
                         urlConnection.disconnect();
@@ -202,11 +201,13 @@ public class MyHandler extends NotificationsHandler {
                 catch(Exception e)
                 {
                     if (isVisible) {
-                        todoActivity.ToastNotify("Exception Sending Notification : " + e.getMessage().toString());
+                        todoActivity.ToastNotify("Exception Sending Notification : " + e.getMessage().toString(), true);
                     }
                 }
             }
         }.start();
+
+
     }
 
     /**
@@ -215,7 +216,7 @@ public class MyHandler extends NotificationsHandler {
      * constructed.
      *
      */
-    private static void parseConnectionString()
+    private void parseConnectionString()
     {
         String connectionString = NotificationSettings.INSTANCE.getHubFullAccess();
         String[] parts = connectionString.split(";");
