@@ -3,10 +3,11 @@ package com.palomaki.familyshoppinglist;
 import android.content.Intent;
 import android.util.Log;
 
-import com.google.firebase.iid.FirebaseInstanceId;
-import com.google.firebase.iid.FirebaseInstanceIdService;
+import com.google.android.gms.iid.InstanceIDListenerService;
+//import com.google.firebase.iid.FirebaseInstanceId;
+//import com.google.firebase.iid.FirebaseInstanceIdService;
 
-public class FslInstanceIDService extends FirebaseInstanceIdService {
+public class FslInstanceIDService extends InstanceIDListenerService {
     private static final String TAG = "FslInstanceIDService";
 
     @Override
@@ -24,5 +25,6 @@ public class FslInstanceIDService extends FirebaseInstanceIdService {
 
         Intent intent = new Intent(this, RegistrationIntentService.class);
         startService(intent);
+
     }
 }
