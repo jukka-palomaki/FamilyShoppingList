@@ -391,9 +391,9 @@ class ToDoActivity : Activity() {
     private fun refreshItemsFromMobileServiceTable(): List<ToDoItem> {
 
         val rows = mToDoTable.
-                where().field("complete").eq(`val`(false)).and().field("userId").eq(`val`(sid1))
-                .or().field("complete").eq(`val`(false)).and().field("userId").eq(`val`(sid2))
-                .or().field("complete").eq(`val`(false)).and().field("userId").eq(`val`(sid3))
+                where().field("complete").eq(`val`(false)).and().field("userId").eq(`val`(GoogleLoginSettings.sid1))
+                .or().field("complete").eq(`val`(false)).and().field("userId").eq(`val`(GoogleLoginSettings.sid2))
+                .or().field("complete").eq(`val`(false)).and().field("userId").eq(`val`(GoogleLoginSettings.sid3))
                 .execute().get()
         return rows
     }
@@ -636,13 +636,10 @@ class ToDoActivity : Activity() {
         }
     }
 
-    private val sid1 = "sid:c73ef5f335bbcf97391c059148999447"
-    private val sid2 = "bbb"
-    private val sid3 = "ccc"
 
     private fun isAllowedUser(sid: String): Boolean {
         when (sid) {
-            sid1, sid2, sid3 -> return true
+            GoogleLoginSettings.sid1, GoogleLoginSettings.sid2, GoogleLoginSettings.sid3 -> return true
             else -> return false
         }
     }
