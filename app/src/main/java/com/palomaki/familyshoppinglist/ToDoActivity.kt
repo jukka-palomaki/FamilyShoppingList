@@ -44,9 +44,11 @@ import com.microsoft.windowsazure.mobileservices.authentication.MobileServiceUse
 
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
+import com.google.android.gms.gcm.GoogleCloudMessaging
 import com.microsoft.windowsazure.notifications.NotificationsManager
 import android.util.Log
 import android.widget.Toast
+
 
 
 
@@ -55,9 +57,10 @@ class ToDoActivity : Activity() {
 
     //var todoActivity: ToDoActivity? = null
     //var static isVisible: Boolean? = false
+    //private val GoogleCloudMessaging gcm
     private val PLAY_SERVICES_RESOLUTION_REQUEST = 9000
 
-    private val TAG = "ToDoActivity";
+    private val TAG = "ToDoActivity"
 
 
 
@@ -184,22 +187,22 @@ class ToDoActivity : Activity() {
 
     override fun onStart() {
         super.onStart()
-        myHandler?.isVisible = true
+        MyHandler.isVisible = true
     }
 
     override fun onPause() {
         super.onPause()
-        myHandler?.isVisible = false
+        MyHandler.isVisible = false
     }
 
     override fun onResume() {
         super.onResume()
-        myHandler?.isVisible = true
+        MyHandler.isVisible = true
     }
 
     override fun onStop() {
         super.onStop()
-        myHandler?.isVisible = false
+        MyHandler.isVisible = false
     }
 
 

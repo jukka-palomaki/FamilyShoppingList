@@ -53,7 +53,7 @@
         </service>
 
         <service
-            android:name=".RegistrationIntentService"
+            android:name="com.palomaki.familyshoppinglist.RegistrationIntentService"
             android:exported="false">
         </service>
 

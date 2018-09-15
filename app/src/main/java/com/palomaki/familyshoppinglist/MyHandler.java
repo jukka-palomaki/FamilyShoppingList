@@ -40,7 +40,7 @@ public class MyHandler extends NotificationsHandler {
     private NotificationHub hub;
 
     public ToDoActivity todoActivity;
-    public Boolean isVisible = false;
+    public static Boolean isVisible = false;
 
     public MyHandler(Context ctx) {
         this.ctx = ctx;
