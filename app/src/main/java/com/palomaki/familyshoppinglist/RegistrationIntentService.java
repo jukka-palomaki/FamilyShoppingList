@@ -81,9 +81,6 @@ public class RegistrationIntentService extends IntentService {
             // on a third-party server, this ensures that we'll attempt the update at a later time.
         }
 
-        // Notify UI that registration has completed.
-        if (MyHandler.isVisible) {
-            MyHandler.todoActivity.ToastNotify(resultString);
-        }
+        Log.d(TAG,"Registration succeeded: " + resultString);
     }
 }

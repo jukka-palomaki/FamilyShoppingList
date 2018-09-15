@@ -46,9 +46,8 @@ import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.microsoft.windowsazure.notifications.NotificationsManager
 import android.util.Log
-import android.widget.TextView
 import android.widget.Toast
-import com.palomaki.familyshoppinglist.MyHandler.isVisible
+
 
 
 class ToDoActivity : Activity() {
@@ -100,11 +99,13 @@ class ToDoActivity : Activity() {
      */
     private var mProgressBar: ProgressBar? = null
 
-    private var mLogInOutButton: Button? = null;
+    private var mLogInOutButton: Button? = null
 
-    private var mAddButton: Button? = null;
+    private var mAddButton: Button? = null
 
     private var userId = ""
+
+    private var myHandler: MyHandler? = null
 
 
     /**
@@ -114,7 +115,8 @@ class ToDoActivity : Activity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_to_do)
 
-        MyHandler.todoActivity = this
+        myHandler = MyHandler(this)
+        myHandler?.todoActivity = this
         NotificationsManager.handleNotifications(this, NotificationSettings.SenderId, MyHandler::class.java)
         registerWithNotificationHubs()
 
@@ -182,30 +184,32 @@ class ToDoActivity : Activity() {
 
     override fun onStart() {
         super.onStart()
-        MyHandler.isVisible = true
+        myHandler?.isVisible = true
     }
 
     override fun onPause() {
         super.onPause()
-        MyHandler.isVisible = false
+        myHandler?.isVisible = false
     }
 
     override fun onResume() {
         super.onResume()
-        MyHandler.isVisible = true
+        myHandler?.isVisible = true
     }
 
     override fun onStop() {
         super.onStop()
-        MyHandler.isVisible = false
+        myHandler?.isVisible = false
     }
 
 
-    fun ToastNotify(notificationMessage: String) {
+    fun ToastNotify(notificationMessage: String, long: Boolean) {
         runOnUiThread {
-            Toast.makeText(this@ToDoActivity, notificationMessage, Toast.LENGTH_LONG).show()
-            //val helloText = findViewById(R.id.text_hello) as TextView
-            //helloText.text = notificationMessage
+            if (long) {
+                Toast.makeText(this@ToDoActivity, notificationMessage, Toast.LENGTH_LONG).show()
+            } else {
+                Toast.makeText(this@ToDoActivity, notificationMessage, Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -229,7 +233,7 @@ class ToDoActivity : Activity() {
     }
 
     fun sendNotificationButtonOnClick(view: View) {
-        MyHandler.sendNotificationButtonOnClick(view)
+        myHandler?.sendNotificationButtonOnClick()
     }
 
 
@@ -340,8 +344,7 @@ class ToDoActivity : Activity() {
      */
     @Throws(ExecutionException::class, InterruptedException::class)
     fun addItemInTable(item: ToDoItem): ToDoItem {
-        val handler = MyHandler(this)
-        handler.sendNotification("Uusi ostos lisätty!")
+        myHandler?.sendNotificationButtonOnClick()
         return mToDoTable.insert(item).get()
     }
 
@@ -614,7 +617,7 @@ class ToDoActivity : Activity() {
                 cacheUserToken(user)
                 mClient.logout()
                 mAdapter!!.clear()
-                Toast.makeText(this@ToDoActivity, "Logged out", Toast.LENGTH_LONG).show()
+                ToastNotify("Logged out", false)
                 mAddButton!!.isEnabled = false
 
             }
@@ -652,7 +655,7 @@ class ToDoActivity : Activity() {
                 val result = mClient.onActivityResult(data)
                 if (result.isLoggedIn && isAllowedUser(mClient.currentUser.userId)) {
                     // sign-in succeeded
-                    Toast.makeText(this@ToDoActivity, "Login succeeded!", Toast.LENGTH_LONG).show()
+                    ToastNotify("Login succeeded!", false)
                     cacheUserToken(mClient.currentUser)
                     createTable()
                 } else {
@@ -682,13 +685,12 @@ class ToDoActivity : Activity() {
                         .show()
             } else {
                 Log.i(TAG, "This device is not supported by Google Play Services.")
-                Toast.makeText(this@ToDoActivity, "This device is not supported by Google Play Services", Toast.LENGTH_LONG).show()
+                ToastNotify("This device is not supported by Google Play Services", true)
                 finish()
             }
             return false
-        } else {
-            Toast.makeText(this@ToDoActivity, "Google Play Services ok", Toast.LENGTH_SHORT).show()
         }
+        ToastNotify("Google Play Services ok", false)
         return true
     }
 
