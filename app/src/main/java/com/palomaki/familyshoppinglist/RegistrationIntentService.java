@@ -52,7 +52,6 @@ public class RegistrationIntentService extends IntentService {
                 // regID = hub.register(token, "tag1", "tag2").getRegistrationId();
 
                 resultString = "Registered Successfully - RegId : " + regID;
-                Log.i(TAG, resultString);
                 sharedPreferences.edit().putString("registrationID", regID ).apply();
             } else {
                 resultString = "Previously Registered Successfully - RegId : " + regID;
@@ -64,10 +63,7 @@ public class RegistrationIntentService extends IntentService {
             // on a third-party server, this ensures that we'll attempt the update at a later time.
         }
 
-        // Notify UI that registration has completed.
-        /*if (MainActivity.isVisible) {
-            MainActivity.mainActivity.ToastNotify(resultString);
-        }*/
+
         Log.d(TAG,"Registration succeeded: " + resultString);
 
 
