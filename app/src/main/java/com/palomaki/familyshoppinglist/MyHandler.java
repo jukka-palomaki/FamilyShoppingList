@@ -141,7 +141,7 @@ public class MyHandler extends NotificationsHandler {
      * @param v
      */
     public static void sendNotificationButtonOnClick(View v) {
-        EditText notificationText = (EditText) todoActivity.findViewById(R.id.editTextNotificationMessage);
+        EditText notificationText = todoActivity.findViewById(R.id.editTextNotificationMessage);
         final String json = "{\"data\":{\"message\":\"" + notificationText.getText().toString() + "\"}}";
 
         new Thread()
