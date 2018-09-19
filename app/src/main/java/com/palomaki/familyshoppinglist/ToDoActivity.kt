@@ -1,4 +1,4 @@
-package com.example.familyshoppinglist
+package com.palomaki.familyshoppinglist
 
 
 import java.net.MalformedURLException
@@ -14,6 +14,8 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+
+import android.widget.EditText;
 
 import com.google.common.util.concurrent.FutureCallback
 import com.google.common.util.concurrent.Futures
@@ -36,13 +38,32 @@ import android.content.Context
 import android.content.Intent
 import android.widget.*
 
-
 import com.microsoft.windowsazure.mobileservices.authentication.MobileServiceAuthenticationProvider;
 import com.microsoft.windowsazure.mobileservices.authentication.MobileServiceUser;
 
+import com.google.android.gms.common.ConnectionResult
+import com.google.android.gms.common.GoogleApiAvailability
+import com.microsoft.windowsazure.notifications.NotificationsManager
+import android.util.Log
+import android.widget.Toast
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.gms.tasks.Task
+import com.google.firebase.messaging.FirebaseMessaging
 
 
 class ToDoActivity : Activity() {
+
+
+    //var todoActivity: ToDoActivity? = null
+    //var static isVisible: Boolean? = false
+    //private val GoogleCloudMessaging gcm
+    private val PLAY_SERVICES_RESOLUTION_REQUEST = 9000
+
+    private val TAG = "ToDoActivity"
+
+
+
+
 
     /**
      * Mobile Service Client reference
@@ -80,11 +101,13 @@ class ToDoActivity : Activity() {
      */
     private var mProgressBar: ProgressBar? = null
 
-    private var mLogInOutButton: Button? = null;
+    private var mLogInOutButton: Button? = null
 
-    private var mAddButton: Button? = null;
+    private var mAddButton: Button? = null
 
     private var userId = ""
+
+    private var myHandler: MyHandler? = null
 
 
     /**
@@ -93,6 +116,11 @@ class ToDoActivity : Activity() {
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_to_do)
+
+        myHandler = MyHandler(this)
+        myHandler?.todoActivity = this
+        NotificationsManager.handleNotifications(this, NotificationSettings.SenderId, MyHandler::class.java)
+        registerWithNotificationHubs()
 
         mProgressBar = findViewById(R.id.loadingProgressBar) as ProgressBar
         mLogInOutButton = findViewById(R.id.buttonLogInOut) as Button
@@ -140,6 +168,52 @@ class ToDoActivity : Activity() {
             createAndShowDialog(e, "Error onCreate")
         }
 
+        /*
+
+        FirebaseMessaging.getInstance().subscribeToTopic("firstFamily").addOnCompleteListener(object : OnCompleteListener<Void> {
+            override fun onComplete(task: Task<Void>) {
+                var msg = "Subscribed"//getString(R.string.msg_subscribed);
+                if (!task.isSuccessful) {
+                    msg = "Subscription failed"//getString(R.string.msg_subscribe_failed);
+                }
+                Log.d(TAG, msg)
+                ToastNotify(msg, false)
+            }
+        })
+
+*/
+
+    }
+
+    override fun onStart() {
+        super.onStart()
+        MyHandler.isVisible = true
+    }
+
+    override fun onPause() {
+        super.onPause()
+        MyHandler.isVisible = false
+    }
+
+    override fun onResume() {
+        super.onResume()
+        MyHandler.isVisible = true
+    }
+
+    override fun onStop() {
+        super.onStop()
+        MyHandler.isVisible = false
+    }
+
+
+    fun ToastNotify(notificationMessage: String, long: Boolean) {
+        runOnUiThread {
+            if (long) {
+                Toast.makeText(this@ToDoActivity, notificationMessage, Toast.LENGTH_LONG).show()
+            } else {
+                Toast.makeText(this@ToDoActivity, notificationMessage, Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     /**
@@ -161,6 +235,9 @@ class ToDoActivity : Activity() {
         return true
     }
 
+    fun sendNotificationButtonOnClick(view: View) {
+        myHandler?.sendNotificationButtonOnClick()
+    }
 
 
     /**
@@ -270,6 +347,7 @@ class ToDoActivity : Activity() {
      */
     @Throws(ExecutionException::class, InterruptedException::class)
     fun addItemInTable(item: ToDoItem): ToDoItem {
+        myHandler?.sendNotificationButtonOnClick()
         return mToDoTable.insert(item).get()
     }
 
@@ -316,9 +394,9 @@ class ToDoActivity : Activity() {
     private fun refreshItemsFromMobileServiceTable(): List<ToDoItem> {
 
         val rows = mToDoTable.
-                where().field("complete").eq(`val`(false)).and().field("userId").eq(`val`(sid1))
-                .or().field("complete").eq(`val`(false)).and().field("userId").eq(`val`(sid2))
-                .or().field("complete").eq(`val`(false)).and().field("userId").eq(`val`(sid3))
+                where().field("complete").eq(`val`(false)).and().field("userId").eq(`val`(GoogleLoginSettings.sid1))
+                .or().field("complete").eq(`val`(false)).and().field("userId").eq(`val`(GoogleLoginSettings.sid2))
+                .or().field("complete").eq(`val`(false)).and().field("userId").eq(`val`(GoogleLoginSettings.sid3))
                 .execute().get()
         return rows
     }
@@ -542,7 +620,7 @@ class ToDoActivity : Activity() {
                 cacheUserToken(user)
                 mClient.logout()
                 mAdapter!!.clear()
-                Toast.makeText(this@ToDoActivity, "Logged out", Toast.LENGTH_LONG).show()
+                ToastNotify("Logged out", false)
                 mAddButton!!.isEnabled = false
 
             }
@@ -561,13 +639,10 @@ class ToDoActivity : Activity() {
         }
     }
 
-    private val sid1 = "aaa"
-    private val sid2 = "bbb"
-    private val sid3 = "ccc"
 
     private fun isAllowedUser(sid: String): Boolean {
         when (sid) {
-            sid1, sid2, sid3 -> return true
+            GoogleLoginSettings.sid1, GoogleLoginSettings.sid2, GoogleLoginSettings.sid3 -> return true
             else -> return false
         }
     }
@@ -580,7 +655,7 @@ class ToDoActivity : Activity() {
                 val result = mClient.onActivityResult(data)
                 if (result.isLoggedIn && isAllowedUser(mClient.currentUser.userId)) {
                     // sign-in succeeded
-                    Toast.makeText(this@ToDoActivity, "Login succeeded!", Toast.LENGTH_LONG).show()
+                    ToastNotify("Login succeeded!", false)
                     cacheUserToken(mClient.currentUser)
                     createTable()
                 } else {
@@ -595,6 +670,42 @@ class ToDoActivity : Activity() {
             }
         }
     }
+
+    /**
+     * Check the device to make sure it has the Google Play Services APK. If
+     * it doesn't, display a dialog that allows users to download the APK from
+     * the Google Play Store or enable it in the device's system settings.
+     */
+    private fun checkPlayServices(): Boolean {
+        val apiAvailability = GoogleApiAvailability.getInstance()
+        val resultCode = apiAvailability.isGooglePlayServicesAvailable(this)
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (apiAvailability.isUserResolvableError(resultCode)) {
+                apiAvailability.getErrorDialog(this, resultCode, PLAY_SERVICES_RESOLUTION_REQUEST)
+                        .show()
+            } else {
+                Log.i(TAG, "This device is not supported by Google Play Services.")
+                ToastNotify("This device is not supported by Google Play Services", true)
+                finish()
+            }
+            return false
+        }
+        ToastNotify("Google Play Services ok", false)
+        return true
+    }
+
+
+
+    fun registerWithNotificationHubs() {
+        if (checkPlayServices()) {
+            // Start IntentService to register this application with FCM.
+            val intent = Intent(this, RegistrationIntentService::class.java)
+            startService(intent)
+        }
+    }
+
+
+
 
     companion object {
 

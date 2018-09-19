@@ -1,4 +1,4 @@
-package com.example.familyshoppinglist
+package com.palomaki.familyshoppinglist
 
 /**
  * Represents an item in a ToDo list

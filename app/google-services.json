@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "656626197250",
+    "firebase_url": "https://familyshoppinglist-209913.firebaseio.com",
+    "project_id": "familyshoppinglist-209913",
+    "storage_bucket": "familyshoppinglist-209913.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:656626197250:android:0bef88e2aa30ba8c",
+        "android_client_info": {
+          "package_name": "com.palomaki.familyshoppinglist"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "656626197250-tqa8bu7o0eehv7r0il7t88l6lpglst8h.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.palomaki.familyshoppinglist",
+            "certificate_hash": "0896b9309927c7d1e1e7612732e1a053b8f492f1"
+          }
+        },
+        {
+          "client_id": "656626197250-2joporo7p11vfgqqhrbivbg35laqq2uo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBHbhifGDf7w9951h0sfAr01EeQEh4oeco"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "656626197250-2joporo7p11vfgqqhrbivbg35laqq2uo.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
