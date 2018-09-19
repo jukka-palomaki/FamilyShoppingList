@@ -10,9 +10,8 @@ import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.util.Base64;
 import android.widget.EditText;
-
-import com.microsoft.windowsazure.messaging.NotificationHub;
 import com.microsoft.windowsazure.notifications.NotificationsHandler;
+import com.microsoft.windowsazure.messaging.NotificationHub;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;

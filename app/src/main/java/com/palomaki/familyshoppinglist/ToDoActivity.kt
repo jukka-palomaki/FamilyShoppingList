@@ -38,18 +38,17 @@ import android.content.Context
 import android.content.Intent
 import android.widget.*
 
-
 import com.microsoft.windowsazure.mobileservices.authentication.MobileServiceAuthenticationProvider;
 import com.microsoft.windowsazure.mobileservices.authentication.MobileServiceUser;
 
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
-import com.google.android.gms.gcm.GoogleCloudMessaging
 import com.microsoft.windowsazure.notifications.NotificationsManager
 import android.util.Log
 import android.widget.Toast
-
-
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.gms.tasks.Task
+import com.google.firebase.messaging.FirebaseMessaging
 
 
 class ToDoActivity : Activity() {
@@ -170,6 +169,7 @@ class ToDoActivity : Activity() {
         }
 
         /*
+
         FirebaseMessaging.getInstance().subscribeToTopic("firstFamily").addOnCompleteListener(object : OnCompleteListener<Void> {
             override fun onComplete(task: Task<Void>) {
                 var msg = "Subscribed"//getString(R.string.msg_subscribed);
@@ -177,11 +177,11 @@ class ToDoActivity : Activity() {
                     msg = "Subscription failed"//getString(R.string.msg_subscribe_failed);
                 }
                 Log.d(TAG, msg)
-                Toast.makeText(this@ToDoActivity, msg, Toast.LENGTH_SHORT).show()
+                ToastNotify(msg, false)
             }
         })
-*/
 
+*/
 
     }
 
@@ -693,6 +693,8 @@ class ToDoActivity : Activity() {
         ToastNotify("Google Play Services ok", false)
         return true
     }
+
+
 
     fun registerWithNotificationHubs() {
         if (checkPlayServices()) {
