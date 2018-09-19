@@ -347,7 +347,7 @@ class ToDoActivity : Activity() {
      */
     @Throws(ExecutionException::class, InterruptedException::class)
     fun addItemInTable(item: ToDoItem): ToDoItem {
-        myHandler?.sendNotificationButtonOnClick()
+        //myHandler?.sendNotificationButtonOnClick()
         return mToDoTable.insert(item).get()
     }
 
@@ -398,7 +398,9 @@ class ToDoActivity : Activity() {
                 .or().field("complete").eq(`val`(false)).and().field("userId").eq(`val`(GoogleLoginSettings.sid2))
                 .or().field("complete").eq(`val`(false)).and().field("userId").eq(`val`(GoogleLoginSettings.sid3))
                 .execute().get()
-        return rows
+
+        val rowsSorted = rows.sortedBy { it.text.trim() }
+        return rowsSorted
     }
 
     //Offline Sync
