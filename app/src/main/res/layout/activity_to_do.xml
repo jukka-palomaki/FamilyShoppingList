@@ -35,10 +35,12 @@
             android:layout_height="28dp" />
     </LinearLayout>
 
+
      <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#71BCFA"
+         android:visibility="gone"
         android:padding="6dip"  >
 
         <EditText
@@ -61,6 +63,32 @@
 
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#71BCFA"
+        android:padding="6dip"  >
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/send_button"
+            android:id="@+id/sendbutton"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"
+            android:onClick="sendNotificationButtonOnClick" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/editTextNotificationMessage"
+            android:layout_above="@+id/sendbutton"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="42dp"
+            android:hint="@string/notification_message_hint" />
+
+    </LinearLayout>
+
     <ListView
         android:id="@+id/listViewToDo"
         android:layout_width="match_parent"
@@ -69,5 +97,7 @@
         android:padding="6dip" >
 
     </ListView>
+
+
 
 </LinearLayout>
