@@ -6,9 +6,9 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import com.google.android.gms.gcm.GoogleCloudMessaging;
-import com.google.android.gms.iid.InstanceID;
-//import com.google.firebase.iid.FirebaseInstanceId;
+//import com.google.android.gms.gcm.GoogleCloudMessaging;
+//import com.google.android.gms.iid.InstanceID;
+    import com.google.firebase.iid.FirebaseInstanceId;
 import com.microsoft.windowsazure.messaging.NotificationHub;
 
 public class RegistrationIntentService extends IntentService {
@@ -25,51 +25,10 @@ public class RegistrationIntentService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         String resultString = null;
         String regID = null;
-
-
-        try {
-            InstanceID instanceID = InstanceID.getInstance(this, null);
-            String token = instanceID.getToken(NotificationSettings.INSTANCE.getSenderId(),
-                    GoogleCloudMessaging.INSTANCE_ID_SCOPE);
-            Log.i(TAG, "Got GCM Registration Token: " + token);
-
-            // Storing the registration id that indicates whether the generated token has been
-            // sent to your server. If it is not stored, send the token to your server,
-            // otherwise your server should have already received the token.
-            if ((regID=sharedPreferences.getString("registrationID", null)) == null) {
-                hub = new NotificationHub(NotificationSettings.INSTANCE.getHubName(),
-                        NotificationSettings.INSTANCE.getHubListenConnectionString(), this);
-                Log.i(TAG, "Attempting to register with NH using token : " + token);
-
-                regID = hub.register(token).getRegistrationId();
-
-                // If you want to use tags...
-                // Refer to : https://azure.microsoft.com/en-us/documentation/articles/notification-hubs-routing-tag-expressions/
-                // regID = hub.register(token, "tag1", "tag2").getRegistrationId();
-
-                resultString = "Registered Successfully - RegId : " + regID;
-                sharedPreferences.edit().putString("registrationID", regID ).apply();
-            } else {
-                resultString = "Previously Registered Successfully - RegId : " + regID;
-            }
-        } catch (Exception e) {
-            Log.e(TAG, resultString="Failed to complete token refresh", e);
-            return;
-            // If an exception happens while fetching the new token or updating the registration data
-            // on a third-party server, this ensures that we'll attempt the update at a later time.
-        }
-
-
-        Log.d(TAG,"Registration succeeded: " + resultString);
-
-
-       /*
-       COMMENTED OUT FIREBASED messaging part
-       String storedToken = null;
+        String storedToken = null;
 
         try {
             String FCM_token = FirebaseInstanceId.getInstance().getToken();
@@ -78,7 +37,7 @@ public class RegistrationIntentService extends IntentService {
             // Storing the registration ID that indicates whether the generated token has been
             // sent to your server. If it is not stored, send the token to your server,
             // otherwise your server should have already received the token.
-            if (((regID=sharedPreferences.getString("registrationID", null)) == null)){
+            if (((regID = sharedPreferences.getString("registrationID", null)) == null)) {
 
                 NotificationHub hub = new NotificationHub(NotificationSettings.INSTANCE.getHubName(),
                         NotificationSettings.INSTANCE.getHubListenConnectionString(), this);
@@ -92,12 +51,12 @@ public class RegistrationIntentService extends IntentService {
                 resultString = "New NH Registration Successfully - RegId : " + regID;
                 Log.d(TAG, resultString);
 
-                sharedPreferences.edit().putString("registrationID", regID ).apply();
-                sharedPreferences.edit().putString("FCMtoken", FCM_token ).apply();
+                sharedPreferences.edit().putString("registrationID", regID).apply();
+                sharedPreferences.edit().putString("FCMtoken", FCM_token).apply();
             }
 
             // Check if the token may have been compromised and needs refreshing.
-            else if ((storedToken=sharedPreferences.getString("FCMtoken", "")) != FCM_token) {
+            else if ((storedToken = sharedPreferences.getString("FCMtoken", "")) != FCM_token) {
 
                 NotificationHub hub = new NotificationHub(NotificationSettings.INSTANCE.getHubName(),
                         NotificationSettings.INSTANCE.getHubListenConnectionString(), this);
@@ -111,19 +70,20 @@ public class RegistrationIntentService extends IntentService {
                 resultString = "New NH Registration Successfully - RegId : " + regID;
                 Log.d(TAG, resultString);
 
-                sharedPreferences.edit().putString("registrationID", regID ).apply();
-                sharedPreferences.edit().putString("FCMtoken", FCM_token ).apply();
-            }
-
-            else {
+                sharedPreferences.edit().putString("registrationID", regID).apply();
+                sharedPreferences.edit().putString("FCMtoken", FCM_token).apply();
+            } else {
                 resultString = "Previously Registered Successfully - RegId : " + regID;
             }
         } catch (Exception e) {
-            Log.e(TAG, resultString="Failed to complete registration", e);
+            Log.e(TAG, resultString = "Failed to complete registration", e);
             // If an exception happens while fetching the new token or updating our registration data
             // on a third-party server, this ensures that we'll attempt the update at a later time.
         }
 
-        Log.d(TAG,"Registration succeeded: " + resultString);*/
+        // Notify UI that registration has completed.
+//        if (ToDoActivity.myHAndleisVisible) {
+        //          ToDoActivity.mainActivity.ToastNotify(resultString);
+        //       }
     }
 }
