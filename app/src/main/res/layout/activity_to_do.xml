@@ -40,7 +40,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#71BCFA"
-         android:visibility="gone"
         android:padding="6dip"  >
 
         <EditText
@@ -67,6 +66,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#71BCFA"
+        android:visibility="gone"
         android:padding="6dip"  >
 
         <Button
