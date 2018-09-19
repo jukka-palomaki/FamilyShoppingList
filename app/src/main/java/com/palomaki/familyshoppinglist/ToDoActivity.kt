@@ -692,7 +692,7 @@ class ToDoActivity : Activity() {
             }
             return false
         }
-        ToastNotify("Google Play Services ok", false)
+        //ToastNotify("Google Play Services ok", false)
         return true
     }
 
