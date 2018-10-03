@@ -2,7 +2,6 @@ package com.palomaki.familyshoppinglist
 
 import android.app.IntentService
 import android.content.Intent
-import android.content.SharedPreferences
 import android.preference.PreferenceManager
 import android.util.Log
 
@@ -20,7 +19,7 @@ class RegistrationIntentService : IntentService(TAG) {
         var regID: String? = null
         var storedToken: String? = null
 
-        /*
+
         try {
             val FCM_token = FirebaseInstanceId.getInstance().token
             if (FCM_token == null) {
@@ -80,7 +79,7 @@ class RegistrationIntentService : IntentService(TAG) {
         //          ToDoActivity.mainActivity.ToastNotify(resultString);
         //       }
 
-        */
+
     }
 
     companion object {
