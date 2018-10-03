@@ -6,8 +6,6 @@ import android.content.SharedPreferences
 import android.preference.PreferenceManager
 import android.util.Log
 
-//import com.google.android.gms.gcm.GoogleCloudMessaging;
-//import com.google.android.gms.iid.InstanceID;
 import com.google.firebase.iid.FirebaseInstanceId
 import com.microsoft.windowsazure.messaging.NotificationHub
 

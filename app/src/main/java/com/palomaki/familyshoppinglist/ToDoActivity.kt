@@ -15,7 +15,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 
-import android.widget.EditText;
+import android.widget.EditText
 
 import com.google.common.util.concurrent.FutureCallback
 import com.google.common.util.concurrent.Futures
@@ -38,16 +38,14 @@ import android.content.Intent
 import android.os.Handler
 import android.widget.*
 
-import com.microsoft.windowsazure.mobileservices.authentication.MobileServiceAuthenticationProvider;
-import com.microsoft.windowsazure.mobileservices.authentication.MobileServiceUser;
+import com.microsoft.windowsazure.mobileservices.authentication.MobileServiceAuthenticationProvider
+import com.microsoft.windowsazure.mobileservices.authentication.MobileServiceUser
 
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.microsoft.windowsazure.notifications.NotificationsManager
 import android.util.Log
 import android.widget.Toast
-import com.google.android.gms.tasks.OnCompleteListener
-import com.google.android.gms.tasks.Task
 import com.google.firebase.messaging.FirebaseMessaging
 import com.microsoft.windowsazure.mobileservices.table.query.Query
 import com.microsoft.windowsazure.mobileservices.table.query.QueryOperations
@@ -58,9 +56,6 @@ import com.palomaki.util.NetworkUtil
 class ToDoActivity : Activity() {
 
 
-    //var todoActivity: ToDoActivity? = null
-    //var static isVisible: Boolean? = false
-    //private val GoogleCloudMessaging gcm
     private val PLAY_SERVICES_RESOLUTION_REQUEST = 9000
 
     private val TAG = "ToDoActivity"
@@ -376,7 +371,7 @@ class ToDoActivity : Activity() {
                     //val results = refreshItemsFromMobileServiceTable()
 
                     //Offline Sync
-                    val results: List<ToDoItem> = refreshItemsFromMobileServiceTableSyncTable();
+                    val results: List<ToDoItem> = refreshItemsFromMobileServiceTableSyncTable()
 
                     runOnUiThread {
                         mAdapter!!.clear()
@@ -423,7 +418,7 @@ class ToDoActivity : Activity() {
         sync().get()
         val query: Query = QueryOperations.field("complete").eq(`val`(false))
 
-        return mToDoTable.read(query).get().sortedBy { it.text.trim() };
+        return mToDoTable.read(query).get().sortedBy { it.text.trim() }
     }
 
 
@@ -494,7 +489,7 @@ class ToDoActivity : Activity() {
             }
         }
 
-        return runAsyncTask(task);
+        return runAsyncTask(task)
     }
 
 
