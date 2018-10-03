@@ -26,11 +26,11 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.google.code.gson:gson:2.8.0'
-    implementation 'com.google.guava:guava:22.0'
-    implementation 'com.google.android.gms:play-services-gcm:15.0.1'
-    implementation 'com.google.firebase:firebase-core:16.0.3'
-    implementation 'com.google.firebase:firebase-messaging:17.3.2'
+    implementation 'com.google.code.gson:gson:2.8.2'
+    implementation 'com.google.guava:guava:24.1-jre'
+    implementation 'com.google.android.gms:play-services-gcm:16.0.0'
+    implementation 'com.google.firebase:firebase-core:16.0.4'
+    implementation 'com.google.firebase:firebase-messaging:17.3.3'
     implementation 'com.microsoft.azure:notification-hubs-android-sdk:0.4@aar'
     implementation 'com.microsoft.azure:azure-notifications-handler:1.0.1@aar'
     implementation 'com.squareup.okhttp:okhttp:2.5.0'
