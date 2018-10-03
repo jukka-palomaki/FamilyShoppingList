@@ -20,6 +20,7 @@ class RegistrationIntentService : IntentService(TAG) {
         var regID: String? = null
         var storedToken: String? = null
 
+        /*
         try {
             val FCM_token = FirebaseInstanceId.getInstance().token
             if (FCM_token == null) {
@@ -78,6 +79,8 @@ class RegistrationIntentService : IntentService(TAG) {
         //        if (ToDoActivity.myHAndleisVisible) {
         //          ToDoActivity.mainActivity.ToastNotify(resultString);
         //       }
+
+        */
     }
 
     companion object {
