@@ -52,6 +52,7 @@ import com.microsoft.windowsazure.mobileservices.table.query.Query
 import com.microsoft.windowsazure.mobileservices.table.query.QueryOperations
 import com.microsoft.windowsazure.mobileservices.table.sync.MobileServiceSyncContext
 import com.microsoft.windowsazure.mobileservices.table.sync.MobileServiceSyncTable
+import com.palomaki.util.NetworkUtil
 
 class ToDoActivity : Activity() {
 
@@ -264,6 +265,7 @@ class ToDoActivity : Activity() {
                     runOnUiThread {
                         if (item.isComplete) {
                             mAdapter!!.remove(item)
+                            refreshItemsFromTable()
                         }
                     }
                 } catch (e: Exception) {
@@ -324,6 +326,7 @@ class ToDoActivity : Activity() {
                     runOnUiThread {
                         if (!entity.isComplete) {
                             mAdapter!!.add(entity)
+                            refreshItemsFromTable()
                         }
                     }
                 } catch (e: Exception) {
@@ -357,6 +360,10 @@ class ToDoActivity : Activity() {
      * Refresh the list with the items in the Table
      */
     private fun refreshItemsFromTable() {
+
+        if (!NetworkUtil.isInternetOk(this@ToDoActivity)) {
+            return
+        }
 
         // Get the items that weren't marked as completed and add them in the
         // adapter

@@ -24,7 +24,7 @@ class RegistrationIntentService : IntentService(TAG) {
 
         try {
             val FCM_token = FirebaseInstanceId.getInstance().token
-            Log.d(TAG, "FCM Registration Token: " + FCM_token!!)
+            //Log.d(TAG, "FCM Registration Token: " + FCM_token!!)
 
             // Storing the registration ID that indicates whether the generated token has been
             // sent to your server. If it is not stored, send the token to your server,
