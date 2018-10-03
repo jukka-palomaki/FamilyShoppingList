@@ -15,7 +15,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 
-import android.widget.EditText;
+import android.widget.EditText
 
 import com.google.common.util.concurrent.FutureCallback
 import com.google.common.util.concurrent.Futures
@@ -26,7 +26,6 @@ import com.microsoft.windowsazure.mobileservices.http.NextServiceFilterCallback
 import com.microsoft.windowsazure.mobileservices.http.ServiceFilter
 import com.microsoft.windowsazure.mobileservices.http.ServiceFilterRequest
 import com.microsoft.windowsazure.mobileservices.http.ServiceFilterResponse
-import com.microsoft.windowsazure.mobileservices.table.MobileServiceTable
 import com.microsoft.windowsazure.mobileservices.table.sync.localstore.ColumnDataType
 import com.microsoft.windowsazure.mobileservices.table.sync.localstore.MobileServiceLocalStoreException
 import com.microsoft.windowsazure.mobileservices.table.sync.localstore.SQLiteLocalStore
@@ -36,27 +35,27 @@ import com.microsoft.windowsazure.mobileservices.table.query.QueryOperations.*
 
 import android.content.Context
 import android.content.Intent
+import android.os.Handler
 import android.widget.*
 
-import com.microsoft.windowsazure.mobileservices.authentication.MobileServiceAuthenticationProvider;
-import com.microsoft.windowsazure.mobileservices.authentication.MobileServiceUser;
+import com.microsoft.windowsazure.mobileservices.authentication.MobileServiceAuthenticationProvider
+import com.microsoft.windowsazure.mobileservices.authentication.MobileServiceUser
 
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.microsoft.windowsazure.notifications.NotificationsManager
 import android.util.Log
 import android.widget.Toast
-import com.google.android.gms.tasks.OnCompleteListener
-import com.google.android.gms.tasks.Task
 import com.google.firebase.messaging.FirebaseMessaging
-
+import com.microsoft.windowsazure.mobileservices.table.query.Query
+import com.microsoft.windowsazure.mobileservices.table.query.QueryOperations
+import com.microsoft.windowsazure.mobileservices.table.sync.MobileServiceSyncContext
+import com.microsoft.windowsazure.mobileservices.table.sync.MobileServiceSyncTable
+import com.palomaki.util.NetworkUtil
 
 class ToDoActivity : Activity() {
 
 
-    //var todoActivity: ToDoActivity? = null
-    //var static isVisible: Boolean? = false
-    //private val GoogleCloudMessaging gcm
     private val PLAY_SERVICES_RESOLUTION_REQUEST = 9000
 
     private val TAG = "ToDoActivity"
@@ -78,13 +77,13 @@ class ToDoActivity : Activity() {
     /**
      * Mobile Service Table used to access data
      */
-    private var mToDoTable: MobileServiceTable<ToDoItem> = mClient.getTable(ToDoItem::class.java)
+    //private var mToDoTable: MobileServiceTable<ToDoItem> = mClient.getTable(ToDoItem::class.java)
 
     //Offline Sync
     /**
      * Mobile Service Table used to access and Sync data
      */
-    //private MobileServiceSyncTable<ToDoItem> mToDoTable;
+    private var mToDoTable: MobileServiceSyncTable<ToDoItem> = mClient.getSyncTable(ToDoItem::class.java)
 
     /**
      * Adapter to sync the items list with the view
@@ -262,6 +261,7 @@ class ToDoActivity : Activity() {
                     runOnUiThread {
                         if (item.isComplete) {
                             mAdapter!!.remove(item)
+                            refreshItemsFromTable()
                         }
                     }
                 } catch (e: Exception) {
@@ -322,6 +322,7 @@ class ToDoActivity : Activity() {
                     runOnUiThread {
                         if (!entity.isComplete) {
                             mAdapter!!.add(entity)
+                            refreshItemsFromTable()
                         }
                     }
                 } catch (e: Exception) {
@@ -356,6 +357,10 @@ class ToDoActivity : Activity() {
      */
     private fun refreshItemsFromTable() {
 
+        if (!NetworkUtil.isInternetOk(this@ToDoActivity)) {
+            return
+        }
+
         // Get the items that weren't marked as completed and add them in the
         // adapter
 
@@ -363,10 +368,10 @@ class ToDoActivity : Activity() {
             override fun doInBackground(vararg params: Void): Void? {
 
                 try {
-                    val results = refreshItemsFromMobileServiceTable()
+                    //val results = refreshItemsFromMobileServiceTable()
 
                     //Offline Sync
-                    //final List<ToDoItem> results = refreshItemsFromMobileServiceTableSyncTable();
+                    val results: List<ToDoItem> = refreshItemsFromMobileServiceTableSyncTable()
 
                     runOnUiThread {
                         mAdapter!!.clear()
@@ -386,11 +391,11 @@ class ToDoActivity : Activity() {
         runAsyncTask(task)
     }
 
-    /**
+    /*
      * Refresh the list with the items in the Mobile Service Table
      */
 
-    @Throws(ExecutionException::class, InterruptedException::class)
+   /* @Throws(ExecutionException::class, InterruptedException::class)
     private fun refreshItemsFromMobileServiceTable(): List<ToDoItem> {
 
         val rows = mToDoTable.
@@ -401,19 +406,21 @@ class ToDoActivity : Activity() {
 
         val rowsSorted = rows.sortedBy { it.text.trim() }
         return rowsSorted
-    }
+    }*/
 
     //Offline Sync
     /**
      * Refresh the list with the items in the Mobile Service Sync Table
      */
-    /*private List<ToDoItem> refreshItemsFromMobileServiceTableSyncTable() throws ExecutionException, InterruptedException {
+    @Throws(ExecutionException::class, InterruptedException::class)
+    private fun refreshItemsFromMobileServiceTableSyncTable(): List<ToDoItem> {
         //sync the data
-        sync().get();
-        Query query = QueryOperations.field("complete").
-                eq(val(false));
-        return mToDoTable.read(query).get();
-    }*/
+        sync().get()
+        val query: Query = QueryOperations.field("complete").eq(`val`(false))
+
+        return mToDoTable.read(query).get().sortedBy { it.text.trim() }
+    }
+
 
     /**
      * Initialize local storage
@@ -439,6 +446,7 @@ class ToDoActivity : Activity() {
                     val tableDefinition = HashMap<String, ColumnDataType>()
                     tableDefinition["id"] = ColumnDataType.String
                     tableDefinition["text"] = ColumnDataType.String
+                    tableDefinition["userId"] = ColumnDataType.String
                     tableDefinition["complete"] = ColumnDataType.Boolean
 
                     localStore.defineTable("ToDoItem", tableDefinition)
@@ -463,24 +471,27 @@ class ToDoActivity : Activity() {
      * Sync the current context and the Mobile Service Sync Table
      * @return
      */
-    /*
-    private AsyncTask<Void, Void, Void> sync() {
-        AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>(){
-            @Override
-            protected Void doInBackground(Void... params) {
+    private fun sync(): AsyncTask<Void, Void, Void>  {
+
+
+        val task = object : AsyncTask<Void, Void, Void>() {
+            override fun doInBackground(vararg params: Void): Void? {
                 try {
-                    MobileServiceSyncContext syncContext = mClient.getSyncContext();
-                    syncContext.push().get();
-                    mToDoTable.pull(null).get();
-                } catch (final Exception e) {
-                    createAndShowDialogFromTask(e, "Error AsyncTask");
+
+                    val syncContext: MobileServiceSyncContext  = mClient.getSyncContext()
+                    syncContext.push().get()
+                    mToDoTable.pull(null).get()
+                } catch (e: Exception) {
+                    createAndShowDialogFromTask(e, "Error AsyncTask")
                 }
-                return null;
+
+                return null
             }
-        };
-        return runAsyncTask(task);
+        }
+
+        return runAsyncTask(task)
     }
-    */
+
 
     /**
      * Creates a dialog and shows it
@@ -508,7 +519,10 @@ class ToDoActivity : Activity() {
         if (exception.cause != null) {
             ex = exception.cause!!
         }
-        createAndShowDialog(ex.message!!, title)
+
+        val message = ex.localizedMessage ?: exception.javaClass.canonicalName
+
+        createAndShowDialog(message, title)
     }
 
     /**
@@ -547,7 +561,11 @@ class ToDoActivity : Activity() {
             val resultFuture = SettableFuture.create<ServiceFilterResponse>()
 
 
-            runOnUiThread { if (mProgressBar != null) mProgressBar!!.visibility = ProgressBar.VISIBLE }
+            runOnUiThread {
+                if (mProgressBar != null) {
+                    mProgressBar!!.visibility = ProgressBar.VISIBLE
+                }
+            }
 
             val future = nextServiceFilterCallback.onNext(request)
 
@@ -557,9 +575,17 @@ class ToDoActivity : Activity() {
                 }
 
                 override fun onSuccess(response: ServiceFilterResponse?) {
-                    runOnUiThread { if (mProgressBar != null) mProgressBar!!.visibility = ProgressBar.GONE }
 
                     resultFuture.set(response)
+                    runOnUiThread {
+                        Handler().postDelayed({
+                            if (mProgressBar != null) {
+                                mProgressBar!!.visibility = ProgressBar.GONE
+                            }
+                        }, 4000)
+                    }
+
+
                 }
             })
 
@@ -571,7 +597,7 @@ class ToDoActivity : Activity() {
     private fun createTable() {
 
         // Get the table instance to use.
-        mToDoTable = mClient.getTable(ToDoItem::class.java)
+        mToDoTable = mClient.getSyncTable(ToDoItem::class.java)
 
         mTextNewToDo = findViewById(R.id.textNewToDo) as EditText
 
@@ -723,3 +749,4 @@ class ToDoActivity : Activity() {
 
 
 }
+
