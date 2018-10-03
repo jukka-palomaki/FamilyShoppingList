@@ -35,6 +35,7 @@ import com.microsoft.windowsazure.mobileservices.table.query.QueryOperations.*
 
 import android.content.Context
 import android.content.Intent
+import android.os.Handler
 import android.widget.*
 
 import com.microsoft.windowsazure.mobileservices.authentication.MobileServiceAuthenticationProvider;
@@ -565,7 +566,11 @@ class ToDoActivity : Activity() {
             val resultFuture = SettableFuture.create<ServiceFilterResponse>()
 
 
-            runOnUiThread { if (mProgressBar != null) mProgressBar!!.visibility = ProgressBar.VISIBLE }
+            runOnUiThread {
+                if (mProgressBar != null) {
+                    mProgressBar!!.visibility = ProgressBar.VISIBLE
+                }
+            }
 
             val future = nextServiceFilterCallback.onNext(request)
 
@@ -575,9 +580,17 @@ class ToDoActivity : Activity() {
                 }
 
                 override fun onSuccess(response: ServiceFilterResponse?) {
-                    runOnUiThread { if (mProgressBar != null) mProgressBar!!.visibility = ProgressBar.GONE }
 
                     resultFuture.set(response)
+                    runOnUiThread {
+                        Handler().postDelayed({
+                            if (mProgressBar != null) {
+                                mProgressBar!!.visibility = ProgressBar.GONE
+                            }
+                        }, 4000)
+                    }
+
+
                 }
             })
 
