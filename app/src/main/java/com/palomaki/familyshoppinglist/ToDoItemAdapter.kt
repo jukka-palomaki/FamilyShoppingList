@@ -1,11 +1,14 @@
 package com.palomaki.familyshoppinglist
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.CheckBox
+import android.widget.EditText
+
 
 /**
  * Adapter to bind a ToDoItem List to a view
@@ -51,7 +54,48 @@ class ToDoItemAdapter(
             }
         }
 
+        checkBox.setOnLongClickListener {
+            displayAlert(checkBox)
+            true
+        }
+
         return row
+    }
+
+    fun displayAlert(checkBox: CheckBox){
+        val alert = AlertDialog.Builder(mContext)
+        var editTextUpdatedText:EditText?=null
+
+        // Builder
+        with (alert) {
+            setTitle("Update shopping item")
+            var name = checkBox.text.toString()
+            setMessage("Original value: ${name}")
+
+            // Add any  input field here
+            editTextUpdatedText=EditText(context)
+            editTextUpdatedText!!.hint="Updated text"
+            //editTextAge!!.inputType = InputType.TYPE_CLASS_NUMBER
+
+            setPositiveButton("OK") {
+                dialog, whichButton ->
+                //showMessage("display the game score or anything!")
+                dialog.dismiss()
+                var age=editTextUpdatedText!!.text.toString()
+                checkBox.text="${age}"
+            }
+
+            setNegativeButton("NO") {
+                dialog, whichButton ->
+                //showMessage("Close the game or anything!")
+                dialog.dismiss()
+            }
+        }
+
+        // Dialog
+        val dialog = alert.create()
+        dialog.setView(editTextUpdatedText)
+        dialog.show()
     }
 
 }
