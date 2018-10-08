@@ -45,6 +45,7 @@ import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.microsoft.windowsazure.notifications.NotificationsManager
 import android.util.Log
+import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
@@ -154,11 +155,6 @@ class ToDoActivity : Activity() {
 
             mTextNewToDo = findViewById(R.id.textNewToDo) as EditText
 
-            // Create an adapter to bind the items with the view
-            mAdapter = ToDoItemAdapter(this, R.layout.row_list_to_do)
-            val listViewToDo = findViewById(R.id.listViewToDo) as ListView
-            listViewToDo.adapter = mAdapter
-
             // Load the items from the Mobile Service
             refreshItemsFromTable()
 
@@ -166,6 +162,17 @@ class ToDoActivity : Activity() {
             createAndShowDialog(Exception("There was an error creating the Mobile Service. Verify the URL"), "Error")
         } catch (e: Exception) {
             createAndShowDialog(e, "Error onCreate")
+        }
+
+
+        findViewById<EditText>(R.id.textNewToDo).setOnEditorActionListener { v, actionId, event ->
+            return@setOnEditorActionListener when (actionId) {
+                EditorInfo.IME_ACTION_DONE -> {
+                    addItem(v)
+                    true
+                }
+                else -> false
+            }
         }
 
         /*
@@ -246,13 +253,10 @@ class ToDoActivity : Activity() {
      * @param item
      * The item to mark
      */
-    fun checkItem(item: ToDoItem) {
+    fun updateItem(item: ToDoItem) {
         if (mClient == null) {
             return
         }
-
-        // Set the item as completed and update it in the table
-        item.isComplete = true
 
         val task = object : AsyncTask<Void, Void, Void>() {
             override fun doInBackground(vararg params: Void): Void? {
@@ -286,6 +290,8 @@ class ToDoActivity : Activity() {
     fun checkItemInTable(item: ToDoItem) {
         mToDoTable.update(item).get()
     }
+
+
 
     /**
      * Add a new item

@@ -1,11 +1,16 @@
 package com.palomaki.familyshoppinglist
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Context
+import android.text.Editable
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.widget.ArrayAdapter
 import android.widget.CheckBox
+import android.widget.EditText
+
 
 /**
  * Adapter to bind a ToDoItem List to a view
@@ -13,14 +18,14 @@ import android.widget.CheckBox
 class ToDoItemAdapter(
 
 
-        /**
-         * Adapter context
-         */
-        internal var mContext: Context,
-        /**
-         * Adapter View layout
-         */
-        internal var mLayoutResourceId: Int) : ArrayAdapter<ToDoItem>(mContext, mLayoutResourceId) {
+    /**
+     * Adapter context
+     */
+    internal var mContext: Context,
+    /**
+     * Adapter View layout
+     */
+    internal var mLayoutResourceId: Int) : ArrayAdapter<ToDoItem>(mContext, mLayoutResourceId) {
 
     /**
      * Returns the view for a specific item on the list
@@ -44,14 +49,59 @@ class ToDoItemAdapter(
         checkBox.setOnClickListener {
             if (checkBox.isChecked) {
                 checkBox.isEnabled = false
-                if (mContext is ToDoActivity) {
-                    val activity = mContext as ToDoActivity
-                    activity.checkItem(currentItem)
-                }
+                currentItem.isComplete = true
+                updateData(currentItem)
             }
         }
 
+        checkBox.setOnLongClickListener {
+
+            val alert = AlertDialog.Builder(mContext)
+            val editTextUpdatedText = EditText(context)
+            editTextUpdatedText.setImeOptions(EditorInfo.IME_ACTION_DONE);
+            editTextUpdatedText.setSingleLine(true)
+
+            // Builder
+            with (alert) {
+                editTextUpdatedText.text = Editable.Factory.getInstance().newEditable(checkBox.text.toString())
+
+
+                setPositiveButton("Update") {
+                    dialog, whichButton ->
+                    dialog.dismiss()
+                    val newValue = editTextUpdatedText.text.toString().trim()
+
+                    if (newValue.isEmpty()) { // when updated to empty text that is same as delete task
+                        currentItem.isComplete = true
+                        checkBox.isChecked = true
+                    }
+                    checkBox.text = newValue
+                    currentItem.text = newValue
+                    updateData(currentItem)
+                }
+
+                setNegativeButton("Keep original") {
+                    dialog, whichButton ->
+                    dialog.dismiss()
+                }
+            }
+
+            // Dialog
+            val dialog = alert.create()
+            dialog.setView(editTextUpdatedText)
+            dialog.show()
+
+            true
+        }
+
         return row
+    }
+
+    private fun updateData(currentItem: ToDoItem) {
+        if (mContext is ToDoActivity) {
+            val activity = mContext as ToDoActivity
+            activity.updateItem(currentItem)
+        }
     }
 
 }
