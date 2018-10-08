@@ -154,11 +154,6 @@ class ToDoActivity : Activity() {
 
             mTextNewToDo = findViewById(R.id.textNewToDo) as EditText
 
-            // Create an adapter to bind the items with the view
-            mAdapter = ToDoItemAdapter(this, R.layout.row_list_to_do)
-            val listViewToDo = findViewById(R.id.listViewToDo) as ListView
-            listViewToDo.adapter = mAdapter
-
             // Load the items from the Mobile Service
             refreshItemsFromTable()
 

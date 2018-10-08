@@ -3,6 +3,7 @@ package com.palomaki.familyshoppinglist
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
+import android.text.Editable
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
@@ -69,24 +70,16 @@ class ToDoItemAdapter(
 
         // Builder
         with (alert) {
-            setTitle("Update shopping item")
-            val name = checkBox.text.toString()
-            setMessage("Original value: ${name}")
+            editTextUpdatedText.text = Editable.Factory.getInstance().newEditable(checkBox.text.toString())
 
-
-            // Add any  input field here
-            editTextUpdatedText.hint="Updated text"
-
-            setPositiveButton("OK") {
+            setPositiveButton("Update") {
                 dialog, whichButton ->
-                //showMessage("display the game score or anything!")
                 dialog.dismiss()
                 checkBox.text = editTextUpdatedText.text.toString()
             }
 
-            setNegativeButton("NO") {
+            setNegativeButton("Keep original") {
                 dialog, whichButton ->
-                //showMessage("Close the game or anything!")
                 dialog.dismiss()
             }
         }
