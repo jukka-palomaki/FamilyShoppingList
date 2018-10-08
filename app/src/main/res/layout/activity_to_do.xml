@@ -49,7 +49,7 @@
             android:layout_weight="1"
             android:inputType="text"
             android:ems="10"
-            android:imeOptions="actionSend"
+            android:imeOptions="actionDone"
             android:hint="@string/add_textbox_hint" >
 
             <requestFocus />
