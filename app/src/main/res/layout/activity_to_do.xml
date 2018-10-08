@@ -47,7 +47,9 @@
             android:layout_width="0dip"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:inputType="text"
             android:ems="10"
+            android:imeOptions="actionSend"
             android:hint="@string/add_textbox_hint" >
 
             <requestFocus />
@@ -74,16 +76,13 @@
             android:layout_height="wrap_content"
             android:text="@string/send_button"
             android:id="@+id/sendbutton"
-            android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true"
             android:onClick="sendNotificationButtonOnClick" />
 
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/editTextNotificationMessage"
-            android:layout_above="@+id/sendbutton"
-            android:layout_centerHorizontal="true"
+            android:imeOptions="actionDone"
             android:layout_marginBottom="42dp"
             android:hint="@string/notification_message_hint" />
 

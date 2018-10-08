@@ -45,6 +45,7 @@ import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.microsoft.windowsazure.notifications.NotificationsManager
 import android.util.Log
+import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
@@ -161,6 +162,17 @@ class ToDoActivity : Activity() {
             createAndShowDialog(Exception("There was an error creating the Mobile Service. Verify the URL"), "Error")
         } catch (e: Exception) {
             createAndShowDialog(e, "Error onCreate")
+        }
+
+
+        findViewById<EditText>(R.id.textNewToDo).setOnEditorActionListener { v, actionId, event ->
+            return@setOnEditorActionListener when (actionId) {
+                EditorInfo.IME_ACTION_SEND -> {
+                    addItem(v)
+                    true
+                }
+                else -> false
+            }
         }
 
         /*
@@ -281,6 +293,8 @@ class ToDoActivity : Activity() {
     fun checkItemInTable(item: ToDoItem) {
         mToDoTable.update(item).get()
     }
+
+
 
     /**
      * Add a new item
