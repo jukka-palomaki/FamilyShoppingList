@@ -17,14 +17,14 @@ import android.widget.EditText
 class ToDoItemAdapter(
 
 
-        /**
-         * Adapter context
-         */
-        internal var mContext: Context,
-        /**
-         * Adapter View layout
-         */
-        internal var mLayoutResourceId: Int) : ArrayAdapter<ToDoItem>(mContext, mLayoutResourceId) {
+    /**
+     * Adapter context
+     */
+    internal var mContext: Context,
+    /**
+     * Adapter View layout
+     */
+    internal var mLayoutResourceId: Int) : ArrayAdapter<ToDoItem>(mContext, mLayoutResourceId) {
 
     /**
      * Returns the view for a specific item on the list
@@ -48,11 +48,8 @@ class ToDoItemAdapter(
         checkBox.setOnClickListener {
             if (checkBox.isChecked) {
                 checkBox.isEnabled = false
-                if (mContext is ToDoActivity) {
-                    val activity = mContext as ToDoActivity
-                    currentItem.isComplete = true
-                    activity.updateItem(currentItem)
-                }
+                currentItem.isComplete = true
+                updateData(currentItem)
             }
         }
 
@@ -68,13 +65,15 @@ class ToDoItemAdapter(
                 setPositiveButton("Update") {
                     dialog, whichButton ->
                     dialog.dismiss()
-                    val newValue = editTextUpdatedText.text.toString()
+                    val newValue = editTextUpdatedText.text.toString().trim()
+
+                    if (newValue.isEmpty()) { // when updated to empty text that is same as delete task
+                        currentItem.isComplete = true
+                        checkBox.isChecked = true
+                    }
                     checkBox.text = newValue
                     currentItem.text = newValue
-                    if (mContext is ToDoActivity) {
-                        val activity = mContext as ToDoActivity
-                        activity.updateItem(currentItem)
-                    }
+                    updateData(currentItem)
                 }
 
                 setNegativeButton("Keep original") {
@@ -92,6 +91,13 @@ class ToDoItemAdapter(
         }
 
         return row
+    }
+
+    private fun updateData(currentItem: ToDoItem) {
+        if (mContext is ToDoActivity) {
+            val activity = mContext as ToDoActivity
+            activity.updateItem(currentItem)
+        }
     }
 
 }
