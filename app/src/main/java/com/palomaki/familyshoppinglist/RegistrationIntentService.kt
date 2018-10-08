@@ -6,6 +6,8 @@ import android.content.SharedPreferences
 import android.preference.PreferenceManager
 import android.util.Log
 
+//import com.google.android.gms.gcm.GoogleCloudMessaging;
+//import com.google.android.gms.iid.InstanceID;
 import com.google.firebase.iid.FirebaseInstanceId
 import com.microsoft.windowsazure.messaging.NotificationHub
 
@@ -20,13 +22,9 @@ class RegistrationIntentService : IntentService(TAG) {
         var regID: String? = null
         var storedToken: String? = null
 
-        /*
         try {
             val FCM_token = FirebaseInstanceId.getInstance().token
-            if (FCM_token == null) {
-                return
-            }
-            //Log.d(TAG, "FCM Registration Token: " + FCM_token!!)
+            Log.d(TAG, "FCM Registration Token: " + FCM_token!!)
 
             // Storing the registration ID that indicates whether the generated token has been
             // sent to your server. If it is not stored, send the token to your server,
@@ -79,8 +77,6 @@ class RegistrationIntentService : IntentService(TAG) {
         //        if (ToDoActivity.myHAndleisVisible) {
         //          ToDoActivity.mainActivity.ToastNotify(resultString);
         //       }
-
-        */
     }
 
     companion object {
