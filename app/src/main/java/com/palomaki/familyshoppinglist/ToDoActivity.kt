@@ -241,13 +241,13 @@ class ToDoActivity : Activity() {
      * @param item
      * The item to mark
      */
-    fun checkItem(item: ToDoItem) {
+    fun updateItem(item: ToDoItem) {
         if (mClient == null) {
             return
         }
 
         // Set the item as completed and update it in the table
-        item.isComplete = true
+        //item.isComplete = true
 
         val task = object : AsyncTask<Void, Void, Void>() {
             override fun doInBackground(vararg params: Void): Void? {

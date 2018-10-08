@@ -50,44 +50,48 @@ class ToDoItemAdapter(
                 checkBox.isEnabled = false
                 if (mContext is ToDoActivity) {
                     val activity = mContext as ToDoActivity
-                    activity.checkItem(currentItem)
+                    currentItem.isComplete = true
+                    activity.updateItem(currentItem)
                 }
             }
         }
 
         checkBox.setOnLongClickListener {
-            displayAlert(checkBox)
+
+            val alert = AlertDialog.Builder(mContext)
+            val editTextUpdatedText = EditText(context)
+
+            // Builder
+            with (alert) {
+                editTextUpdatedText.text = Editable.Factory.getInstance().newEditable(checkBox.text.toString())
+
+                setPositiveButton("Update") {
+                    dialog, whichButton ->
+                    dialog.dismiss()
+                    val newValue = editTextUpdatedText.text.toString()
+                    checkBox.text = newValue
+                    currentItem.text = newValue
+                    if (mContext is ToDoActivity) {
+                        val activity = mContext as ToDoActivity
+                        activity.updateItem(currentItem)
+                    }
+                }
+
+                setNegativeButton("Keep original") {
+                    dialog, whichButton ->
+                    dialog.dismiss()
+                }
+            }
+
+            // Dialog
+            val dialog = alert.create()
+            dialog.setView(editTextUpdatedText)
+            dialog.show()
 
             true
         }
 
         return row
-    }
-
-    fun displayAlert(checkBox: CheckBox){
-        val alert = AlertDialog.Builder(mContext)
-        val editTextUpdatedText = EditText(context)
-
-        // Builder
-        with (alert) {
-            editTextUpdatedText.text = Editable.Factory.getInstance().newEditable(checkBox.text.toString())
-
-            setPositiveButton("Update") {
-                dialog, whichButton ->
-                dialog.dismiss()
-                checkBox.text = editTextUpdatedText.text.toString()
-            }
-
-            setNegativeButton("Keep original") {
-                dialog, whichButton ->
-                dialog.dismiss()
-            }
-        }
-
-        // Dialog
-        val dialog = alert.create()
-        dialog.setView(editTextUpdatedText)
-        dialog.show()
     }
 
 }
