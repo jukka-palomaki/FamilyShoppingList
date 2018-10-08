@@ -39,22 +39,22 @@
             </intent-filter>
         </activity>
 
-
-        <service
-            android:name=".FslInstanceIDService">
-            <intent-filter>
-                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
-            </intent-filter>
-        </service>
-
-
         <!--
-        <service android:name="com.palomaki.familyshoppinglist.FslInstanceIDService" android:exported="false">
-            <intent-filter>
-                <action android:name="com.google.android.gms.iid.InstanceID"/>
-            </intent-filter>
-        </service>
-        -->
+                <service
+                    android:name=".FslInstanceIDService">
+                    <intent-filter>
+                        <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+                    </intent-filter>
+                </service>
+
+
+
+                <service android:name="com.palomaki.familyshoppinglist.FslInstanceIDService" android:exported="false">
+                    <intent-filter>
+                        <action android:name="com.google.android.gms.iid.InstanceID"/>
+                    </intent-filter>
+                </service>
+                -->
 
         <service
             android:name=".RegistrationIntentService"
