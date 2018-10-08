@@ -6,6 +6,7 @@ import android.content.Context
 import android.text.Editable
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.widget.ArrayAdapter
 import android.widget.CheckBox
 import android.widget.EditText
@@ -57,10 +58,13 @@ class ToDoItemAdapter(
 
             val alert = AlertDialog.Builder(mContext)
             val editTextUpdatedText = EditText(context)
+            editTextUpdatedText.setImeOptions(EditorInfo.IME_ACTION_DONE);
+            editTextUpdatedText.setSingleLine(true)
 
             // Builder
             with (alert) {
                 editTextUpdatedText.text = Editable.Factory.getInstance().newEditable(checkBox.text.toString())
+
 
                 setPositiveButton("Update") {
                     dialog, whichButton ->
