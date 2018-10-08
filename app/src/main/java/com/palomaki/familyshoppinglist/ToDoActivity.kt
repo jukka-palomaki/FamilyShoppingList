@@ -258,9 +258,6 @@ class ToDoActivity : Activity() {
             return
         }
 
-        // Set the item as completed and update it in the table
-        //item.isComplete = true
-
         val task = object : AsyncTask<Void, Void, Void>() {
             override fun doInBackground(vararg params: Void): Void? {
                 try {
