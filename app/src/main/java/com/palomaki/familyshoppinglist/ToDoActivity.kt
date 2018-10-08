@@ -167,7 +167,7 @@ class ToDoActivity : Activity() {
 
         findViewById<EditText>(R.id.textNewToDo).setOnEditorActionListener { v, actionId, event ->
             return@setOnEditorActionListener when (actionId) {
-                EditorInfo.IME_ACTION_SEND -> {
+                EditorInfo.IME_ACTION_DONE -> {
                     addItem(v)
                     true
                 }
