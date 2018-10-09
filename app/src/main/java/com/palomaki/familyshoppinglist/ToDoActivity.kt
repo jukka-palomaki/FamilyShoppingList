@@ -128,7 +128,7 @@ class ToDoActivity : Activity() {
         mAddButton = findViewById(R.id.buttonAddToDo) as Button
 
         // Initialize the progress bar
-        mProgressBar!!.visibility = ProgressBar.GONE
+        mProgressBar?.visibility = ProgressBar.GONE
 
         try {
 
@@ -265,7 +265,7 @@ class ToDoActivity : Activity() {
                     checkItemInTable(item)
                     runOnUiThread {
                         if (item.isComplete) {
-                            mAdapter!!.remove(item)
+                            mAdapter?.remove(item)
                         }
                     }
                 } catch (e: Exception) {
@@ -307,7 +307,7 @@ class ToDoActivity : Activity() {
         // Create a new item
         val item = ToDoItem()
 
-        item.text = mTextNewToDo!!.text.toString()
+        item.text = mTextNewToDo?.text.toString()
         if (item.text.trim().isEmpty()) {
             createAndShowDialog("Cannot add empty item","Error")
             return
@@ -327,7 +327,7 @@ class ToDoActivity : Activity() {
 
                     runOnUiThread {
                         if (!entity.isComplete) {
-                            mAdapter!!.add(entity)
+                            mAdapter?.add(entity)
                         }
                     }
                 } catch (e: Exception) {
@@ -340,7 +340,7 @@ class ToDoActivity : Activity() {
 
         runAsyncTask(task)
 
-        mTextNewToDo!!.setText("")
+        mTextNewToDo?.setText("")
     }
 
 
@@ -375,10 +375,10 @@ class ToDoActivity : Activity() {
                     //final List<ToDoItem> results = refreshItemsFromMobileServiceTableSyncTable();
 
                     runOnUiThread {
-                        mAdapter!!.clear()
+                        mAdapter?.clear()
 
                         for (item in results) {
-                            mAdapter!!.add(item)
+                            mAdapter?.add(item)
                         }
                     }
                 } catch (e: Exception) {
@@ -553,7 +553,7 @@ class ToDoActivity : Activity() {
             val resultFuture = SettableFuture.create<ServiceFilterResponse>()
 
 
-            runOnUiThread { if (mProgressBar != null) mProgressBar!!.visibility = ProgressBar.VISIBLE }
+            runOnUiThread { if (mProgressBar != null) mProgressBar?.visibility = ProgressBar.VISIBLE }
 
             val future = nextServiceFilterCallback.onNext(request)
 
@@ -563,7 +563,7 @@ class ToDoActivity : Activity() {
                 }
 
                 override fun onSuccess(response: ServiceFilterResponse?) {
-                    runOnUiThread { if (mProgressBar != null) mProgressBar!!.visibility = ProgressBar.GONE }
+                    runOnUiThread { if (mProgressBar != null) mProgressBar?.visibility = ProgressBar.GONE }
 
                     resultFuture.set(response)
                 }
@@ -607,7 +607,7 @@ class ToDoActivity : Activity() {
 
         val user = MobileServiceUser(userId)
         user.authenticationToken = token
-        client!!.currentUser = user
+        client?.currentUser = user
 
         return true
     }
@@ -619,7 +619,7 @@ class ToDoActivity : Activity() {
             if (mAdapter == null || mAdapter!!.isEmpty()) {
                 // Sign in using the Google provider.
                 mClient.login(MobileServiceAuthenticationProvider.Google, "familyshoppinglist", GOOGLE_LOGIN_REQUEST_CODE)
-                mAddButton!!.isEnabled = true
+                mAddButton?.isEnabled = true
             } else {
                 val prefs = getSharedPreferences(SHAREDPREFFILE, Context.MODE_PRIVATE)
                 userId = prefs.getString(USERIDPREF, "") ?: return
@@ -627,9 +627,9 @@ class ToDoActivity : Activity() {
                 user.authenticationToken = null
                 cacheUserToken(user)
                 mClient.logout()
-                mAdapter!!.clear()
+                mAdapter?.clear()
                 ToastNotify("Logged out", false)
-                mAddButton!!.isEnabled = false
+                mAddButton?.isEnabled = false
 
             }
         }
@@ -641,9 +641,7 @@ class ToDoActivity : Activity() {
             createTable()
         } else {
             //Else we show an empty table with login button
-            if (mAdapter != null) {
-                mAdapter!!.clear()
-            }
+            mAdapter?.clear()
         }
     }
 
