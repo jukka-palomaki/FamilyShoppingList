@@ -616,7 +616,7 @@ class ToDoActivity : Activity() {
     fun loginLogout(view: View) {
 
         if (view is Button && !mClient.isLoginInProgress) {
-            if (mAdapter!!.isEmpty()) {
+            if (mAdapter == null || mAdapter!!.isEmpty()) {
                 // Sign in using the Google provider.
                 mClient.login(MobileServiceAuthenticationProvider.Google, "familyshoppinglist", GOOGLE_LOGIN_REQUEST_CODE)
                 mAddButton!!.isEnabled = true
