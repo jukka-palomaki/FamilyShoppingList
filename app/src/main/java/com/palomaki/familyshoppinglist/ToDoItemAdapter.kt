@@ -94,6 +94,14 @@ class ToDoItemAdapter(
             true
         }
 
+        val checkBoxPriority = row.findViewById(R.id.checkPriority) as CheckBox
+        checkBoxPriority.isChecked = currentItem.isHighPriority
+
+        checkBoxPriority.setOnClickListener {
+            currentItem.isHighPriority = checkBoxPriority.isChecked
+            updateData(currentItem)
+        }
+
         return row
     }
 
