@@ -405,7 +405,7 @@ class ToDoActivity : Activity() {
                 .or().field("complete").eq(`val`(false)).and().field("userId").eq(`val`(GoogleLoginSettings.sid3))
                 .execute().get()
 
-        val rowsSorted = rows.sortedBy { it.text.trim() }
+        val rowsSorted = rows.sortedBy { (!it.isHighPriority).toString() + it.text.trim()  }
         return rowsSorted
     }
 
