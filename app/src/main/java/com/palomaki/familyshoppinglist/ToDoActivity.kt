@@ -400,9 +400,7 @@ class ToDoActivity : Activity() {
     private fun refreshItemsFromMobileServiceTable(): List<ToDoItem> {
 
         val rows = mToDoTable.
-                where().field("complete").eq(`val`(false)).and().field("userId").eq(`val`(GoogleLoginSettings.sid1))
-                .or().field("complete").eq(`val`(false)).and().field("userId").eq(`val`(GoogleLoginSettings.sid2))
-                .or().field("complete").eq(`val`(false)).and().field("userId").eq(`val`(GoogleLoginSettings.sid3))
+                where().field("complete").eq(`val`(false)).and().field("userId").eq(`val`(mClient.currentUser.userId))
                 .execute().get()
 
         val rowsSorted = rows.sortedBy { (!it.isHighPriority).toString() + it.text.trim()  }
@@ -646,20 +644,13 @@ class ToDoActivity : Activity() {
     }
 
 
-    private fun isAllowedUser(sid: String): Boolean {
-        when (sid) {
-            GoogleLoginSettings.sid1, GoogleLoginSettings.sid2, GoogleLoginSettings.sid3 -> return true
-            else -> return false
-        }
-    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
         // When request completes
         if (resultCode == RESULT_OK) {
             // Check the request code matches the one we send in the sign-in request
             if (requestCode == GOOGLE_LOGIN_REQUEST_CODE) {
                 val result = mClient.onActivityResult(data)
-                if (result.isLoggedIn && isAllowedUser(mClient.currentUser.userId)) {
+                if (result.isLoggedIn) {
                     // sign-in succeeded
                     ToastNotify("Login succeeded!", false)
                     cacheUserToken(mClient.currentUser)
