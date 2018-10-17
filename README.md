@@ -19,3 +19,4 @@ Future improvements that can come or not :)
 - Hamburger menu for login and logout 
 - Accidentally completed (deleted) shopping items you should be able to bring back during e.g. one hour or day
 - Push notifications when other user adds items. With settings you can either decide to receive them or not, and send them or not).
+- Functionality without internet (automatic syncing when connection comes back)
