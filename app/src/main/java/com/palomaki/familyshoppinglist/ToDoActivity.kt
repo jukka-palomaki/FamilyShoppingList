@@ -256,18 +256,17 @@ class ToDoActivity : Activity() {
                     runOnUiThread {
                         if (item.isComplete) {
                             mAdapter?.remove(item)
+                        } else {
+                            mAdapter?.sort({x, y -> x.compareTo(y)})
                         }
                     }
                 } catch (e: Exception) {
                     createAndShowDialogFromTask(e, "Error checkItem")
                 }
-
                 return null
             }
         }
-
         runAsyncTask(task)
-
     }
 
     /**
