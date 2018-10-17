@@ -17,4 +17,5 @@ Future improvements that can come or not :)
 - Facebook login
 - Other login solution (without gmail or Facebook)
 - Hamburger menu for login and logout 
-- Accidentally completed shopping items you should be able to bring back during e.g. one hour or day
+- Accidentally completed (deleted) shopping items you should be able to bring back during e.g. one hour or day
+- Push notifications when other user adds items. With settings you can either decide to receive them or not, and send them or not).
