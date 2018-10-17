@@ -3,7 +3,7 @@ package com.palomaki.familyshoppinglist
 /**
  * Represents an item in a ToDo list
  */
-class ToDoItem {
+class ToDoItem : Comparable<ToDoItem> {
 
     /**
      * Item text
@@ -50,4 +50,12 @@ class ToDoItem {
     override fun equals(other: Any?): Boolean {
         return other is ToDoItem && other.id === this.id
     }
+
+    override operator fun compareTo(f: ToDoItem): Int {
+
+        return text.compareTo(f.text)
+
+    }
+
+
 }

@@ -2,7 +2,6 @@ package com.palomaki.familyshoppinglist
 
 
 import java.net.MalformedURLException
-import java.util.HashMap
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
 
@@ -47,23 +46,14 @@ import com.microsoft.windowsazure.notifications.NotificationsManager
 import android.util.Log
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
-import com.google.android.gms.tasks.OnCompleteListener
-import com.google.android.gms.tasks.Task
-import com.google.firebase.messaging.FirebaseMessaging
 
 
 class ToDoActivity : Activity() {
 
 
-    //var todoActivity: ToDoActivity? = null
-    //var static isVisible: Boolean? = false
-    //private val GoogleCloudMessaging gcm
     private val PLAY_SERVICES_RESOLUTION_REQUEST = 9000
 
     private val TAG = "ToDoActivity"
-
-
-
 
 
     /**
@@ -328,6 +318,7 @@ class ToDoActivity : Activity() {
                     runOnUiThread {
                         if (!entity.isComplete) {
                             mAdapter?.add(entity)
+                            mAdapter?.sort({x, y -> x.compareTo(y)})
                         }
                     }
                 } catch (e: Exception) {
