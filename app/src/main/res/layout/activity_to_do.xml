@@ -88,14 +88,20 @@
 
     </LinearLayout>
 
-    <ListView
-        android:id="@+id/listViewToDo"
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        tools:listitem="@layout/row_list_to_do"
-        android:padding="6dip" >
+        android:layout_height="match_parent"
+        >
+        <ListView
+            android:id="@+id/listViewToDo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:listitem="@layout/row_list_to_do"
+            android:padding="6dip" >
 
-    </ListView>
+        </ListView>
+    </android.support.v4.widget.SwipeRefreshLayout>
 
 
 
