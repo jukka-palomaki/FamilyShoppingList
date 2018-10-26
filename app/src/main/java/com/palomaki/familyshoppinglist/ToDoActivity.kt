@@ -35,6 +35,8 @@ import com.microsoft.windowsazure.mobileservices.table.query.QueryOperations.*
 
 import android.content.Context
 import android.content.Intent
+import android.os.Handler
+import android.support.v4.widget.SwipeRefreshLayout
 import android.widget.*
 
 import com.microsoft.windowsazure.mobileservices.authentication.MobileServiceAuthenticationProvider;
@@ -80,25 +82,29 @@ class ToDoActivity : Activity() {
     /**
      * Adapter to sync the items list with the view
      */
-    private var mAdapter: ToDoItemAdapter? = null
+    private lateinit var mAdapter: ToDoItemAdapter
 
     /**
      * EditText containing the "New To Do" text
      */
-    private var mTextNewToDo: EditText? = null
+    private lateinit var mTextNewToDo: EditText
 
     /**
      * Progress spinner to use for table operations
      */
-    private var mProgressBar: ProgressBar? = null
+    private lateinit var mProgressBar: ProgressBar
+    private lateinit var swipeLayout: SwipeRefreshLayout
 
-    private var mLogInOutButton: Button? = null
+    private lateinit var mLogInOutButton: Button
 
-    private var mAddButton: Button? = null
+    private lateinit var mAddButton: Button
 
     private var userId = ""
 
-    private var myHandler: MyHandler? = null
+    private lateinit var myHandler: MyHandler
+
+    private lateinit var mHandler: Handler
+    private lateinit var mRunnable: Runnable
 
 
     /**
@@ -109,16 +115,16 @@ class ToDoActivity : Activity() {
         setContentView(R.layout.activity_to_do)
 
         myHandler = MyHandler(this)
-        myHandler?.todoActivity = this
+        myHandler.todoActivity = this
         NotificationsManager.handleNotifications(this, NotificationSettings.SenderId, MyHandler::class.java)
         registerWithNotificationHubs()
 
-        mProgressBar = findViewById(R.id.loadingProgressBar) as ProgressBar
         mLogInOutButton = findViewById(R.id.buttonLogInOut) as Button
         mAddButton = findViewById(R.id.buttonAddToDo) as Button
+        mProgressBar = findViewById(R.id.loadingProgressBar) as ProgressBar
 
         // Initialize the progress bar
-        mProgressBar?.visibility = ProgressBar.GONE
+        mProgressBar.visibility = ProgressBar.GONE
 
         try {
 
@@ -164,6 +170,31 @@ class ToDoActivity : Activity() {
                 else -> false
             }
         }
+
+        // Initialize the handler instance
+        mHandler = Handler()
+
+
+        // Set an on refresh listener for swipe refresh layout
+        swipeLayout = findViewById(R.id.swipe_refresh_layout)
+
+        swipeLayout.setOnRefreshListener {
+            // Initialize a new Runnable
+            mRunnable = Runnable {
+                // Update the text view text with a random number
+                refreshItemsFromTable()
+
+                // Hide swipe to refresh icon animation
+                swipeLayout.isRefreshing  = false
+            }
+
+            // Execute the task after specified time
+            mHandler.postDelayed(
+                    mRunnable,
+                    2000) // Delay 1 to 5 seconds
+
+        }
+
 
         /*
 
@@ -233,7 +264,7 @@ class ToDoActivity : Activity() {
     }
 
     fun sendNotificationButtonOnClick(view: View) {
-        myHandler?.sendNotificationButtonOnClick()
+        myHandler.sendNotificationButtonOnClick()
     }
 
 
@@ -255,9 +286,9 @@ class ToDoActivity : Activity() {
                     checkItemInTable(item)
                     runOnUiThread {
                         if (item.isComplete) {
-                            mAdapter?.remove(item)
+                            mAdapter.remove(item)
                         } else {
-                            mAdapter?.sort({x, y -> x.compareTo(y)})
+                            mAdapter.sort({x, y -> x.compareTo(y)})
                         }
                     }
                 } catch (e: Exception) {
@@ -296,7 +327,7 @@ class ToDoActivity : Activity() {
         // Create a new item
         val item = ToDoItem()
 
-        item.text = mTextNewToDo?.text.toString()
+        item.text = mTextNewToDo.text.toString()
         if (item.text.trim().isEmpty()) {
             createAndShowDialog("Cannot add empty item","Error")
             return
@@ -316,8 +347,8 @@ class ToDoActivity : Activity() {
 
                     runOnUiThread {
                         if (!entity.isComplete) {
-                            mAdapter?.add(entity)
-                            mAdapter?.sort({x, y -> x.compareTo(y)})
+                            mAdapter.add(entity)
+                            mAdapter.sort({x, y -> x.compareTo(y)})
                         }
                     }
                 } catch (e: Exception) {
@@ -330,7 +361,7 @@ class ToDoActivity : Activity() {
 
         runAsyncTask(task)
 
-        mTextNewToDo?.setText("")
+        mTextNewToDo.setText("")
     }
 
 
@@ -343,7 +374,7 @@ class ToDoActivity : Activity() {
      */
     @Throws(ExecutionException::class, InterruptedException::class)
     fun addItemInTable(item: ToDoItem): ToDoItem {
-        //myHandler?.sendNotificationButtonOnClick()
+        //myHandler.sendNotificationButtonOnClick()
         return mToDoTable.insert(item).get()
     }
 
@@ -365,10 +396,10 @@ class ToDoActivity : Activity() {
                     //final List<ToDoItem> results = refreshItemsFromMobileServiceTableSyncTable();
 
                     runOnUiThread {
-                        mAdapter?.clear()
+                        mAdapter.clear()
 
                         for (item in results) {
-                            mAdapter?.add(item)
+                            mAdapter.add(item)
                         }
                     }
                 } catch (e: Exception) {
@@ -541,7 +572,7 @@ class ToDoActivity : Activity() {
             val resultFuture = SettableFuture.create<ServiceFilterResponse>()
 
 
-            runOnUiThread { if (mProgressBar != null) mProgressBar?.visibility = ProgressBar.VISIBLE }
+            runOnUiThread { mProgressBar.visibility = ProgressBar.VISIBLE }
 
             val future = nextServiceFilterCallback.onNext(request)
 
@@ -551,7 +582,7 @@ class ToDoActivity : Activity() {
                 }
 
                 override fun onSuccess(response: ServiceFilterResponse?) {
-                    runOnUiThread { if (mProgressBar != null) mProgressBar?.visibility = ProgressBar.GONE }
+                    runOnUiThread { mProgressBar.visibility = ProgressBar.GONE }
 
                     resultFuture.set(response)
                 }
@@ -607,7 +638,7 @@ class ToDoActivity : Activity() {
             if (mAdapter == null || mAdapter!!.isEmpty()) {
                 // Sign in using the Google provider.
                 mClient.login(MobileServiceAuthenticationProvider.Google, "familyshoppinglist", GOOGLE_LOGIN_REQUEST_CODE)
-                mAddButton?.isEnabled = true
+                mAddButton.isEnabled = true
             } else {
                 val prefs = getSharedPreferences(SHAREDPREFFILE, Context.MODE_PRIVATE)
                 userId = prefs.getString(USERIDPREF, "") ?: return
@@ -615,9 +646,9 @@ class ToDoActivity : Activity() {
                 user.authenticationToken = null
                 cacheUserToken(user)
                 mClient.logout()
-                mAdapter?.clear()
+                mAdapter.clear()
                 ToastNotify("Logged out", false)
-                mAddButton?.isEnabled = false
+                mAddButton.isEnabled = false
 
             }
         }
@@ -629,7 +660,7 @@ class ToDoActivity : Activity() {
             createTable()
         } else {
             //Else we show an empty table with login button
-            mAdapter?.clear()
+            mAdapter.clear()
         }
     }
 
