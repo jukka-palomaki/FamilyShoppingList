@@ -35,6 +35,9 @@ import com.microsoft.windowsazure.mobileservices.table.query.QueryOperations.*
 
 import android.content.Context
 import android.content.Intent
+import android.os.Handler
+import android.support.v4.widget.SwipeRefreshLayout
+import android.text.Layout
 import android.widget.*
 
 import com.microsoft.windowsazure.mobileservices.authentication.MobileServiceAuthenticationProvider;
@@ -46,6 +49,7 @@ import com.microsoft.windowsazure.notifications.NotificationsManager
 import android.util.Log
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
+import com.palomaki.familyshoppinglist.R.id.swipe_refresh_layout
 
 
 class ToDoActivity : Activity() {
@@ -91,6 +95,7 @@ class ToDoActivity : Activity() {
      * Progress spinner to use for table operations
      */
     private var mProgressBar: ProgressBar? = null
+    private var swipeLayout: SwipeRefreshLayout? = null
 
     private var mLogInOutButton: Button? = null
 
@@ -99,6 +104,9 @@ class ToDoActivity : Activity() {
     private var userId = ""
 
     private var myHandler: MyHandler? = null
+
+    private lateinit var mHandler: Handler
+    private lateinit var mRunnable:Runnable
 
 
     /**
@@ -113,9 +121,9 @@ class ToDoActivity : Activity() {
         NotificationsManager.handleNotifications(this, NotificationSettings.SenderId, MyHandler::class.java)
         registerWithNotificationHubs()
 
-        mProgressBar = findViewById(R.id.loadingProgressBar) as ProgressBar
         mLogInOutButton = findViewById(R.id.buttonLogInOut) as Button
         mAddButton = findViewById(R.id.buttonAddToDo) as Button
+        mProgressBar = findViewById(R.id.loadingProgressBar) as ProgressBar
 
         // Initialize the progress bar
         mProgressBar?.visibility = ProgressBar.GONE
@@ -164,6 +172,31 @@ class ToDoActivity : Activity() {
                 else -> false
             }
         }
+
+        // Initialize the handler instance
+        mHandler = Handler()
+
+
+        // Set an on refresh listener for swipe refresh layout
+        swipeLayout = findViewById(R.id.swipe_refresh_layout)
+
+        swipeLayout?.setOnRefreshListener {
+            // Initialize a new Runnable
+            mRunnable = Runnable {
+                // Update the text view text with a random number
+                refreshItemsFromTable()
+
+                // Hide swipe to refresh icon animation
+                swipeLayout!!.isRefreshing  = false
+            }
+
+            // Execute the task after specified time
+            mHandler.postDelayed(
+                    mRunnable,
+                    2000) // Delay 1 to 5 seconds
+
+        }
+
 
         /*
 
@@ -541,7 +574,7 @@ class ToDoActivity : Activity() {
             val resultFuture = SettableFuture.create<ServiceFilterResponse>()
 
 
-            runOnUiThread { if (mProgressBar != null) mProgressBar?.visibility = ProgressBar.VISIBLE }
+            runOnUiThread { mProgressBar?.visibility = ProgressBar.VISIBLE }
 
             val future = nextServiceFilterCallback.onNext(request)
 
@@ -551,7 +584,7 @@ class ToDoActivity : Activity() {
                 }
 
                 override fun onSuccess(response: ServiceFilterResponse?) {
-                    runOnUiThread { if (mProgressBar != null) mProgressBar?.visibility = ProgressBar.GONE }
+                    runOnUiThread { mProgressBar?.visibility = ProgressBar.GONE }
 
                     resultFuture.set(response)
                 }
