@@ -226,28 +226,7 @@ class ToDoActivity : Activity() {
      */
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.activity_main, menu)
-
         return true
-
-        /*when (item.itemId) {
-            R.id.action_cut -> {
-                text_view.text = "Cut"
-                return true
-            }
-            R.id.action_copy -> {
-                text_view.text = "Copy"
-                return true
-            }
-            R.id.action_paste -> {
-                text_view.text = "Paste"
-                return true
-            }
-            R.id.action_new -> {
-                text_view.text = "New"
-                return true
-            }
-        }
-        return super.onOptionsItemSelected(item)*/
     }
 
 
