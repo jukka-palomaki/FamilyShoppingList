@@ -14,7 +14,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 
-import android.widget.EditText;
+import android.widget.EditText
 
 import com.google.common.util.concurrent.FutureCallback
 import com.google.common.util.concurrent.Futures
@@ -39,8 +39,8 @@ import android.os.Handler
 import android.support.v4.widget.SwipeRefreshLayout
 import android.widget.*
 
-import com.microsoft.windowsazure.mobileservices.authentication.MobileServiceAuthenticationProvider;
-import com.microsoft.windowsazure.mobileservices.authentication.MobileServiceUser;
+import com.microsoft.windowsazure.mobileservices.authentication.MobileServiceAuthenticationProvider
+import com.microsoft.windowsazure.mobileservices.authentication.MobileServiceUser
 
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
@@ -89,13 +89,7 @@ class ToDoActivity : Activity() {
      */
     private lateinit var mTextNewToDo: EditText
 
-    /**
-     * Progress spinner to use for table operations
-     */
-    private lateinit var mProgressBar: ProgressBar
     private lateinit var swipeLayout: SwipeRefreshLayout
-
-    private lateinit var mLogInOutButton: Button
 
     private lateinit var mAddButton: Button
 
@@ -106,6 +100,8 @@ class ToDoActivity : Activity() {
     private lateinit var mHandler: Handler
     private lateinit var mRunnable: Runnable
 
+
+    private val refreshDelay = 500L
 
     /**
      * Initializes the activity
@@ -119,15 +115,9 @@ class ToDoActivity : Activity() {
         NotificationsManager.handleNotifications(this, NotificationSettings.SenderId, MyHandler::class.java)
         registerWithNotificationHubs()
 
-        mLogInOutButton = findViewById(R.id.buttonLogInOut) as Button
         mAddButton = findViewById(R.id.buttonAddToDo) as Button
-        mProgressBar = findViewById(R.id.loadingProgressBar) as ProgressBar
-
-        // Initialize the progress bar
-        mProgressBar.visibility = ProgressBar.GONE
 
         try {
-
 
             // Extend timeout from default of 10s to 20s
             mClient.setAndroidHttpClientFactory {
@@ -179,20 +169,7 @@ class ToDoActivity : Activity() {
         swipeLayout = findViewById(R.id.swipe_refresh_layout)
 
         swipeLayout.setOnRefreshListener {
-            // Initialize a new Runnable
-            mRunnable = Runnable {
-                // Update the text view text with a random number
-                refreshItemsFromTable()
-
-                // Hide swipe to refresh icon animation
-                swipeLayout.isRefreshing  = false
-            }
-
-            // Execute the task after specified time
-            mHandler.postDelayed(
-                    mRunnable,
-                    2000) // Delay 1 to 5 seconds
-
+            refreshItemsFromTable()
         }
 
 
@@ -200,9 +177,9 @@ class ToDoActivity : Activity() {
 
         FirebaseMessaging.getInstance().subscribeToTopic("firstFamily").addOnCompleteListener(object : OnCompleteListener<Void> {
             override fun onComplete(task: Task<Void>) {
-                var msg = "Subscribed"//getString(R.string.msg_subscribed);
+                var msg = "Subscribed"//getString(R.string.msg_subscribed)
                 if (!task.isSuccessful) {
-                    msg = "Subscription failed"//getString(R.string.msg_subscribe_failed);
+                    msg = "Subscription failed"//getString(R.string.msg_subscribe_failed)
                 }
                 Log.d(TAG, msg)
                 ToastNotify(msg, false)
@@ -252,12 +229,17 @@ class ToDoActivity : Activity() {
         return true
     }
 
+
+
+
     /**
      * Select an option from the menu
      */
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == R.id.menu_refresh) {
             refreshItemsFromTable()
+        } else if (item.itemId == R.id.menu_loginlogout) {
+            loginLogout()
         }
 
         return true
@@ -393,7 +375,7 @@ class ToDoActivity : Activity() {
                     val results = refreshItemsFromMobileServiceTable()
 
                     //Offline Sync
-                    //final List<ToDoItem> results = refreshItemsFromMobileServiceTableSyncTable();
+                    //final List<ToDoItem> results = refreshItemsFromMobileServiceTableSyncTable()
 
                     runOnUiThread {
                         mAdapter.clear()
@@ -572,7 +554,9 @@ class ToDoActivity : Activity() {
             val resultFuture = SettableFuture.create<ServiceFilterResponse>()
 
 
-            runOnUiThread { mProgressBar.visibility = ProgressBar.VISIBLE }
+            runOnUiThread {
+                swipeLayout.isRefreshing  = true
+            }
 
             val future = nextServiceFilterCallback.onNext(request)
 
@@ -582,7 +566,19 @@ class ToDoActivity : Activity() {
                 }
 
                 override fun onSuccess(response: ServiceFilterResponse?) {
-                    runOnUiThread { mProgressBar.visibility = ProgressBar.GONE }
+                    runOnUiThread {
+                        mRunnable = Runnable {
+                            // Update the text view text with a random number
+
+                            // Hide swipe to refresh icon animation
+                            swipeLayout.isRefreshing  = false
+                        }
+
+                        // Execute the task after specified time
+                        mHandler.postDelayed(
+                                mRunnable,
+                                refreshDelay)
+                    }
 
                     resultFuture.set(response)
                 }
@@ -632,9 +628,9 @@ class ToDoActivity : Activity() {
     }
 
 
-    fun loginLogout(view: View) {
+    fun loginLogout() {
 
-        if (view is Button && !mClient.isLoginInProgress) {
+        if (!mClient.isLoginInProgress) {
             if (mAdapter == null || mAdapter!!.isEmpty()) {
                 // Sign in using the Google provider.
                 mClient.login(MobileServiceAuthenticationProvider.Google, "familyshoppinglist", GOOGLE_LOGIN_REQUEST_CODE)
@@ -683,7 +679,7 @@ class ToDoActivity : Activity() {
                     if (errorMessage == null) {
                         errorMessage = "Not allowed user"
                     }
-                    createAndShowDialog(errorMessage, "Erroria")
+                    createAndShowDialog(errorMessage, "Error")
                 }
             }
         }
