@@ -582,8 +582,8 @@ class ToDoActivity : Activity() {
         }
     }
 
+    
     companion object {
-
 
         // You can choose any unique number here to differentiate auth providers from each other. Note this is the same code at login() and onActivityResult().
         val GOOGLE_LOGIN_REQUEST_CODE = 1
@@ -593,6 +593,5 @@ class ToDoActivity : Activity() {
         val USERIDPREF = "uid"
         val TOKENPREF = "tkn"
     }
-
 
 }
