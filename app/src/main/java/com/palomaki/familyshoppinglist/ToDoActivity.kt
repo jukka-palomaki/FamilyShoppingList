@@ -42,10 +42,6 @@ import android.widget.*
 import com.microsoft.windowsazure.mobileservices.authentication.MobileServiceAuthenticationProvider
 import com.microsoft.windowsazure.mobileservices.authentication.MobileServiceUser
 
-import com.google.android.gms.common.ConnectionResult
-import com.google.android.gms.common.GoogleApiAvailability
-import com.microsoft.windowsazure.notifications.NotificationsManager
-import android.util.Log
 import android.view.Gravity
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
@@ -53,11 +49,7 @@ import android.widget.Toast
 
 class ToDoActivity : Activity() {
 
-
-    private val PLAY_SERVICES_RESOLUTION_REQUEST = 9000
-
     private val TAG = "ToDoActivity"
-
 
     /**
      * Mobile Service Client reference
@@ -74,33 +66,23 @@ class ToDoActivity : Activity() {
      */
     private var mToDoTable: MobileServiceTable<ToDoItem> = mClient.getTable(ToDoItem::class.java)
 
-    //Offline Sync
-    /**
-     * Mobile Service Table used to access and Sync data
-     */
-    //private MobileServiceSyncTable<ToDoItem> mToDoTable;
 
     /**
      * Adapter to sync the items list with the view
      */
     private lateinit var mAdapter: ToDoItemAdapter
 
-    /**
-     * EditText containing the "New To Do" text
-     */
-    private lateinit var mTextNewToDo: EditText
+    private lateinit var mTextNextShopItem: EditText
 
-    private lateinit var swipeLayout: SwipeRefreshLayout
+    private lateinit var mSwipeLayout: SwipeRefreshLayout
 
     private lateinit var mAddButton: Button
 
     private var userId = ""
 
-    private lateinit var myHandler: MyHandler
-
     private lateinit var mHandler: Handler
-    private lateinit var mRunnable: Runnable
 
+    private lateinit var mRunnable: Runnable
 
     private val refreshDelay = 500L
 
@@ -110,11 +92,6 @@ class ToDoActivity : Activity() {
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_to_do)
-
-        myHandler = MyHandler(this)
-        myHandler.todoActivity = this
-        NotificationsManager.handleNotifications(this, NotificationSettings.SenderId, MyHandler::class.java)
-        registerWithNotificationHubs()
 
         mAddButton = findViewById(R.id.buttonAddToDo) as Button
 
@@ -130,17 +107,10 @@ class ToDoActivity : Activity() {
 
             authenticate()
 
-            // Get the Mobile Service Table instance to use
-
-            //mToDoTable = mClient.getTable(ToDoItem::class.java)
-
-            // Offline Sync
-            //mToDoTable = mClient.getSyncTable("ToDoItem", ToDoItem.class);
-
             //Init local storage
             initLocalStore().get()
 
-            mTextNewToDo = findViewById(R.id.textNewToDo) as EditText
+            mTextNextShopItem = findViewById(R.id.textNewToDo) as EditText
 
             // Load the items from the Mobile Service
             refreshItemsFromTable()
@@ -165,53 +135,13 @@ class ToDoActivity : Activity() {
         // Initialize the handler instance
         mHandler = Handler()
 
-
         // Set an on refresh listener for swipe refresh layout
-        swipeLayout = findViewById(R.id.swipe_refresh_layout)
-
-        swipeLayout.setOnRefreshListener {
+        mSwipeLayout = findViewById(R.id.swipe_refresh_layout)
+        mSwipeLayout.setOnRefreshListener {
             refreshItemsFromTable()
         }
 
-
-        /*
-
-        FirebaseMessaging.getInstance().subscribeToTopic("firstFamily").addOnCompleteListener(object : OnCompleteListener<Void> {
-            override fun onComplete(task: Task<Void>) {
-                var msg = "Subscribed"//getString(R.string.msg_subscribed)
-                if (!task.isSuccessful) {
-                    msg = "Subscription failed"//getString(R.string.msg_subscribe_failed)
-                }
-                Log.d(TAG, msg)
-                toastNotify(msg, false)
-            }
-        })
-
-*/
-
     }
-
-    override fun onStart() {
-        super.onStart()
-        MyHandler.isVisible = true
-    }
-
-    override fun onPause() {
-        super.onPause()
-        MyHandler.isVisible = false
-    }
-
-    override fun onResume() {
-        super.onResume()
-        MyHandler.isVisible = true
-    }
-
-    override fun onStop() {
-        super.onStop()
-        MyHandler.isVisible = false
-    }
-
-
 
 
     fun toastNotify(notificationMessage: String, long: Boolean, useUiThread: Boolean = true) {
@@ -241,9 +171,6 @@ class ToDoActivity : Activity() {
         return true
     }
 
-
-
-
     /**
      * Select an option from the menu
      */
@@ -256,11 +183,6 @@ class ToDoActivity : Activity() {
 
         return true
     }
-
-    fun sendNotificationButtonOnClick(view: View) {
-        myHandler.sendNotificationButtonOnClick()
-    }
-
 
     /**
      * Mark an item as completed
@@ -306,8 +228,6 @@ class ToDoActivity : Activity() {
         mToDoTable.update(item).get()
     }
 
-
-
     /**
      * Add a new item
      *
@@ -322,7 +242,7 @@ class ToDoActivity : Activity() {
         // Create a new item
         val item = ToDoItem()
 
-        item.text = mTextNewToDo.text.toString()
+        item.text = mTextNextShopItem.text.toString()
         if (item.text.trim().isEmpty()) {
             createAndShowDialog("Cannot add empty item","Error")
             return
@@ -356,7 +276,7 @@ class ToDoActivity : Activity() {
 
         runAsyncTask(task)
 
-        mTextNewToDo.setText("")
+        mTextNextShopItem.setText("")
     }
 
 
@@ -423,18 +343,6 @@ class ToDoActivity : Activity() {
         return rowsSorted
     }
 
-    //Offline Sync
-    /**
-     * Refresh the list with the items in the Mobile Service Sync Table
-     */
-    /*private List<ToDoItem> refreshItemsFromMobileServiceTableSyncTable() throws ExecutionException, InterruptedException {
-        //sync the data
-        sync().get();
-        Query query = QueryOperations.field("complete").
-                eq(val(false));
-        return mToDoTable.read(query).get();
-    }*/
-
     /**
      * Initialize local storage
      * @return
@@ -477,30 +385,6 @@ class ToDoActivity : Activity() {
 
         return runAsyncTask(task)
     }
-
-    //Offline Sync
-    /**
-     * Sync the current context and the Mobile Service Sync Table
-     * @return
-     */
-    /*
-    private AsyncTask<Void, Void, Void> sync() {
-        AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>(){
-            @Override
-            protected Void doInBackground(Void... params) {
-                try {
-                    MobileServiceSyncContext syncContext = mClient.getSyncContext();
-                    syncContext.push().get();
-                    mToDoTable.pull(null).get();
-                } catch (final Exception e) {
-                    createAndShowDialogFromTask(e, "Error AsyncTask");
-                }
-                return null;
-            }
-        };
-        return runAsyncTask(task);
-    }
-    */
 
     /**
      * Creates a dialog and shows it
@@ -568,7 +452,7 @@ class ToDoActivity : Activity() {
 
 
             runOnUiThread {
-                swipeLayout.isRefreshing  = true
+                mSwipeLayout.isRefreshing  = true
             }
 
             val future = nextServiceFilterCallback.onNext(request)
@@ -584,7 +468,7 @@ class ToDoActivity : Activity() {
                             // Update the text view text with a random number
 
                             // Hide swipe to refresh icon animation
-                            swipeLayout.isRefreshing  = false
+                            mSwipeLayout.isRefreshing  = false
                         }
 
                         // Execute the task after specified time
@@ -607,7 +491,7 @@ class ToDoActivity : Activity() {
         // Get the table instance to use.
         mToDoTable = mClient.getTable(ToDoItem::class.java)
 
-        mTextNewToDo = findViewById(R.id.textNewToDo) as EditText
+        mTextNextShopItem = findViewById(R.id.textNewToDo) as EditText
 
         // Create an adapter to bind the items with the view.
         mAdapter = ToDoItemAdapter(this, R.layout.row_list_to_do)
@@ -698,44 +582,8 @@ class ToDoActivity : Activity() {
         }
     }
 
-    /**
-     * Check the device to make sure it has the Google Play Services APK. If
-     * it doesn't, display a dialog that allows users to download the APK from
-     * the Google Play Store or enable it in the device's system settings.
-     */
-    private fun checkPlayServices(): Boolean {
-        val apiAvailability = GoogleApiAvailability.getInstance()
-        val resultCode = apiAvailability.isGooglePlayServicesAvailable(this)
-        if (resultCode != ConnectionResult.SUCCESS) {
-            if (apiAvailability.isUserResolvableError(resultCode)) {
-                apiAvailability.getErrorDialog(this, resultCode, PLAY_SERVICES_RESOLUTION_REQUEST)
-                        .show()
-            } else {
-                Log.i(TAG, "This device is not supported by Google Play Services.")
-                toastNotify("This device is not supported by Google Play Services", true)
-                finish()
-            }
-            return false
-        }
-        //toastNotify("Google Play Services ok", false)
-        return true
-    }
-
-
-
-    fun registerWithNotificationHubs() {
-        if (checkPlayServices()) {
-            // Start IntentService to register this application with FCM.
-            val intent = Intent(this, RegistrationIntentService::class.java)
-            startService(intent)
-        }
-    }
-
-
-
-
+    
     companion object {
-
 
         // You can choose any unique number here to differentiate auth providers from each other. Note this is the same code at login() and onActivityResult().
         val GOOGLE_LOGIN_REQUEST_CODE = 1
@@ -745,6 +593,5 @@ class ToDoActivity : Activity() {
         val USERIDPREF = "uid"
         val TOKENPREF = "tkn"
     }
-
 
 }
