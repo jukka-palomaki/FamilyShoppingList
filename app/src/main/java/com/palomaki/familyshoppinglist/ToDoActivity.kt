@@ -46,6 +46,7 @@ import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.microsoft.windowsazure.notifications.NotificationsManager
 import android.util.Log
+import android.view.Gravity
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 
@@ -182,7 +183,7 @@ class ToDoActivity : Activity() {
                     msg = "Subscription failed"//getString(R.string.msg_subscribe_failed)
                 }
                 Log.d(TAG, msg)
-                ToastNotify(msg, false)
+                toastNotify(msg, false)
             }
         })
 
@@ -211,14 +212,25 @@ class ToDoActivity : Activity() {
     }
 
 
-    fun ToastNotify(notificationMessage: String, long: Boolean) {
-        runOnUiThread {
-            if (long) {
-                Toast.makeText(this@ToDoActivity, notificationMessage, Toast.LENGTH_LONG).show()
-            } else {
-                Toast.makeText(this@ToDoActivity, notificationMessage, Toast.LENGTH_SHORT).show()
+
+
+    fun toastNotify(notificationMessage: String, long: Boolean, useUiThread: Boolean = true) {
+        if (useUiThread) {
+            runOnUiThread {
+                toaster(notificationMessage, long)
             }
+        } else {
+            toaster(notificationMessage, long)
         }
+    }
+
+    private fun toaster(notificationMessage: String, longToast: Boolean) {
+        val toast = Toast.makeText(
+                this@ToDoActivity,
+                notificationMessage,
+                if (longToast) Toast.LENGTH_LONG else Toast.LENGTH_SHORT)
+        toast.setGravity(Gravity.CENTER, 0, 0)
+        toast.show()
     }
 
     /**
@@ -269,6 +281,7 @@ class ToDoActivity : Activity() {
                     runOnUiThread {
                         if (item.isComplete) {
                             mAdapter.remove(item)
+                            toastNotify("${item.text} removed", true, false)
                         } else {
                             mAdapter.sort({x, y -> x.compareTo(y)})
                         }
@@ -643,7 +656,7 @@ class ToDoActivity : Activity() {
                 cacheUserToken(user)
                 mClient.logout()
                 mAdapter.clear()
-                ToastNotify("Logged out", false)
+                toastNotify("Logged out", false)
                 mAddButton.isEnabled = false
 
             }
@@ -669,7 +682,7 @@ class ToDoActivity : Activity() {
                 val result = mClient.onActivityResult(data)
                 if (result.isLoggedIn) {
                     // sign-in succeeded
-                    ToastNotify("Login succeeded!", false)
+                    toastNotify("Login succeeded!", false)
                     cacheUserToken(mClient.currentUser)
                     createTable()
                 } else {
@@ -699,12 +712,12 @@ class ToDoActivity : Activity() {
                         .show()
             } else {
                 Log.i(TAG, "This device is not supported by Google Play Services.")
-                ToastNotify("This device is not supported by Google Play Services", true)
+                toastNotify("This device is not supported by Google Play Services", true)
                 finish()
             }
             return false
         }
-        //ToastNotify("Google Play Services ok", false)
+        //toastNotify("Google Play Services ok", false)
         return true
     }
 
