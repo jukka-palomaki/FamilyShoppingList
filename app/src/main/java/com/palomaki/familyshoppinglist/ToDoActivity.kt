@@ -72,17 +72,17 @@ class ToDoActivity : Activity() {
      */
     private lateinit var mAdapter: ToDoItemAdapter
 
-    private lateinit var mTextNewToDo: EditText
+    private lateinit var mTextNextShopItem: EditText
 
-    private lateinit var swipeLayout: SwipeRefreshLayout
+    private lateinit var mSwipeLayout: SwipeRefreshLayout
 
     private lateinit var mAddButton: Button
 
     private var userId = ""
 
     private lateinit var mHandler: Handler
-    private lateinit var mRunnable: Runnable
 
+    private lateinit var mRunnable: Runnable
 
     private val refreshDelay = 500L
 
@@ -110,7 +110,7 @@ class ToDoActivity : Activity() {
             //Init local storage
             initLocalStore().get()
 
-            mTextNewToDo = findViewById(R.id.textNewToDo) as EditText
+            mTextNextShopItem = findViewById(R.id.textNewToDo) as EditText
 
             // Load the items from the Mobile Service
             refreshItemsFromTable()
@@ -136,8 +136,8 @@ class ToDoActivity : Activity() {
         mHandler = Handler()
 
         // Set an on refresh listener for swipe refresh layout
-        swipeLayout = findViewById(R.id.swipe_refresh_layout)
-        swipeLayout.setOnRefreshListener {
+        mSwipeLayout = findViewById(R.id.swipe_refresh_layout)
+        mSwipeLayout.setOnRefreshListener {
             refreshItemsFromTable()
         }
 
@@ -242,7 +242,7 @@ class ToDoActivity : Activity() {
         // Create a new item
         val item = ToDoItem()
 
-        item.text = mTextNewToDo.text.toString()
+        item.text = mTextNextShopItem.text.toString()
         if (item.text.trim().isEmpty()) {
             createAndShowDialog("Cannot add empty item","Error")
             return
@@ -276,7 +276,7 @@ class ToDoActivity : Activity() {
 
         runAsyncTask(task)
 
-        mTextNewToDo.setText("")
+        mTextNextShopItem.setText("")
     }
 
 
@@ -452,7 +452,7 @@ class ToDoActivity : Activity() {
 
 
             runOnUiThread {
-                swipeLayout.isRefreshing  = true
+                mSwipeLayout.isRefreshing  = true
             }
 
             val future = nextServiceFilterCallback.onNext(request)
@@ -468,7 +468,7 @@ class ToDoActivity : Activity() {
                             // Update the text view text with a random number
 
                             // Hide swipe to refresh icon animation
-                            swipeLayout.isRefreshing  = false
+                            mSwipeLayout.isRefreshing  = false
                         }
 
                         // Execute the task after specified time
@@ -491,7 +491,7 @@ class ToDoActivity : Activity() {
         // Get the table instance to use.
         mToDoTable = mClient.getTable(ToDoItem::class.java)
 
-        mTextNewToDo = findViewById(R.id.textNewToDo) as EditText
+        mTextNextShopItem = findViewById(R.id.textNewToDo) as EditText
 
         // Create an adapter to bind the items with the view.
         mAdapter = ToDoItemAdapter(this, R.layout.row_list_to_do)
