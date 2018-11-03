@@ -51,14 +51,19 @@ class ToDoActivity : Activity() {
 
     private val TAG = "ToDoActivity"
 
+    private val appUrl = "https://familyshoppinglist.azurewebsites.net"
+
+    private val completeCol = "complete"
+    private val textCol = "text"
+    private val idCol = "id"
+    private val userIdCol = "userId"
+
     /**
      * Mobile Service Client reference
      * Create the Mobile Service Client instance, using the provided
      * Mobile Service URL and key
      */
-    private val mClient = MobileServiceClient(
-    "https://familyshoppinglist.azurewebsites.net",
-    this).withFilter(ProgressFilter())
+    private val mClient = MobileServiceClient(appUrl, this).withFilter(ProgressFilter())
 
 
     /**
@@ -248,11 +253,7 @@ class ToDoActivity : Activity() {
             return
         }
         item.isComplete = false
-
-        //val prefs = getSharedPreferences(SHAREDPREFFILE, Context.MODE_PRIVATE)
-
-        item.userId = userId //prefs.getString(USERIDPREF, null)
-
+        item.userId = userId
 
         // Insert the new item
         val task = object : AsyncTask<Void, Void, Void>() {
@@ -289,7 +290,6 @@ class ToDoActivity : Activity() {
      */
     @Throws(ExecutionException::class, InterruptedException::class)
     fun addItemInTable(item: ToDoItem): ToDoItem {
-        //myHandler.sendNotificationButtonOnClick()
         return mToDoTable.insert(item).get()
     }
 
@@ -306,9 +306,6 @@ class ToDoActivity : Activity() {
 
                 try {
                     val results = refreshItemsFromMobileServiceTable()
-
-                    //Offline Sync
-                    //final List<ToDoItem> results = refreshItemsFromMobileServiceTableSyncTable()
 
                     runOnUiThread {
                         mAdapter.clear()
@@ -328,6 +325,7 @@ class ToDoActivity : Activity() {
         runAsyncTask(task)
     }
 
+
     /**
      * Refresh the list with the items in the Mobile Service Table
      */
@@ -336,7 +334,8 @@ class ToDoActivity : Activity() {
     private fun refreshItemsFromMobileServiceTable(): List<ToDoItem> {
 
         val rows = mToDoTable.
-                where().field("complete").eq(`val`(false)).and().field("userId").eq(`val`(mClient.currentUser.userId))
+                where().field(completeCol).eq(`val`(false)).
+                and().field(userIdCol).eq(`val`(mClient.currentUser.userId))
                 .execute().get()
 
         val rowsSorted = rows.sortedBy { (!it.isHighPriority).toString() + it.text.trim()  }
@@ -365,9 +364,9 @@ class ToDoActivity : Activity() {
                     val localStore = SQLiteLocalStore(mClient.context, "OfflineStore", null, 1)
 
                     val tableDefinition = HashMap<String, ColumnDataType>()
-                    tableDefinition["id"] = ColumnDataType.String
-                    tableDefinition["text"] = ColumnDataType.String
-                    tableDefinition["complete"] = ColumnDataType.Boolean
+                    tableDefinition[idCol] = ColumnDataType.String
+                    tableDefinition[textCol] = ColumnDataType.String
+                    tableDefinition[completeCol] = ColumnDataType.Boolean
 
                     localStore.defineTable("ToDoItem", tableDefinition)
 
@@ -587,8 +586,6 @@ class ToDoActivity : Activity() {
 
         // You can choose any unique number here to differentiate auth providers from each other. Note this is the same code at login() and onActivityResult().
         val GOOGLE_LOGIN_REQUEST_CODE = 1
-
-
         val SHAREDPREFFILE = "temp"
         val USERIDPREF = "uid"
         val TOKENPREF = "tkn"
