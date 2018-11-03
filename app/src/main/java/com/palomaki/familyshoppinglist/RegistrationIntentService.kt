@@ -75,7 +75,7 @@ class RegistrationIntentService : IntentService(TAG) {
 
         // Notify UI that registration has completed.
         //        if (ToDoActivity.myHAndleisVisible) {
-        //          ToDoActivity.mainActivity.ToastNotify(resultString);
+        //          ToDoActivity.mainActivity.toastNotify(resultString);
         //       }
     }
 
