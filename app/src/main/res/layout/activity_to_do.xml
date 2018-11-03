@@ -35,30 +35,6 @@
 
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#71BCFA"
-        android:visibility="gone"
-        android:padding="6dip"  >
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/send_button"
-            android:id="@+id/sendbutton"
-            android:onClick="sendNotificationButtonOnClick" />
-
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/editTextNotificationMessage"
-            android:imeOptions="actionDone"
-            android:layout_marginBottom="42dp"
-            android:hint="@string/notification_message_hint" />
-
-    </LinearLayout>
-
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/swipe_refresh_layout"
         android:layout_width="match_parent"
