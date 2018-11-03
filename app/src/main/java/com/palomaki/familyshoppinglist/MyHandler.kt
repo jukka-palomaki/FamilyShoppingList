@@ -5,7 +5,6 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.media.RingtoneManager
-import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.NotificationCompat
 import android.util.Base64
@@ -16,7 +15,6 @@ import com.microsoft.windowsazure.messaging.NotificationHub
 import java.io.BufferedOutputStream
 import java.io.BufferedReader
 import java.io.InputStreamReader
-import java.io.OutputStream
 import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLEncoder
@@ -43,7 +41,7 @@ class MyHandler(private var ctx: Context?) : NotificationsHandler() {
         val nhMessage = bundle.getString("message")
         sendNotification(nhMessage)
         if (isVisible!!) {
-            todoActivity!!.ToastNotify(nhMessage!!, true)
+            todoActivity!!.toastNotify(nhMessage!!, true)
         }
         super.onReceive(context, bundle)
     }
@@ -71,7 +69,7 @@ class MyHandler(private var ctx: Context?) : NotificationsHandler() {
         mBuilder!!.setContentIntent(contentIntent)
         mNotificationManager!!.notify(NOTIFICATION_ID, mBuilder!!.build())
 
-        todoActivity!!.ToastNotify(msg!!, true)
+        todoActivity!!.toastNotify(msg!!, true)
     }
 
 
@@ -111,7 +109,7 @@ class MyHandler(private var ctx: Context?) : NotificationsHandler() {
                     + signature + "&se=" + expires + "&skn=" + HubSasKeyName)
         } catch (e: Exception) {
             if (isVisible!!) {
-                todoActivity!!.ToastNotify("Exception Generating SaS : " + e.message.toString(), true)
+                todoActivity!!.toastNotify("Exception Generating SaS : " + e.message.toString(), true)
             }
         }
 
@@ -180,14 +178,14 @@ class MyHandler(private var ctx: Context?) : NotificationsHandler() {
                                 line = br.readLine()
                             }
 
-                            todoActivity!!.ToastNotify(builder.toString(), true)
+                            todoActivity!!.toastNotify(builder.toString(), true)
                         }
                     } finally {
                         urlConnection.disconnect()
                     }
                 } catch (e: Exception) {
                     if (isVisible!!) {
-                        todoActivity!!.ToastNotify("Exception Sending Notification : " + e.message.toString(), true)
+                        todoActivity!!.toastNotify("Exception Sending Notification : " + e.message.toString(), true)
                     }
                 }
 
