@@ -35,6 +35,7 @@ import com.microsoft.windowsazure.mobileservices.table.query.QueryOperations.*
 
 import android.content.Context
 import android.content.Intent
+import android.opengl.Visibility
 import android.os.Handler
 import android.support.v4.widget.SwipeRefreshLayout
 import android.widget.*
@@ -91,6 +92,8 @@ class ToDoActivity : Activity() {
 
     private val refreshDelay = 500L
 
+    private lateinit var mProgressBar: ProgressBar
+
     /**
      * Initializes the activity
      */
@@ -99,6 +102,7 @@ class ToDoActivity : Activity() {
         setContentView(R.layout.activity_to_do)
 
         mAddButton = findViewById(R.id.buttonAddToDo) as Button
+        mProgressBar = findViewById(R.id.progressBar) as ProgressBar
 
         try {
 
@@ -143,8 +147,11 @@ class ToDoActivity : Activity() {
         // Set an on refresh listener for swipe refresh layout
         mSwipeLayout = findViewById(R.id.swipe_refresh_layout)
         mSwipeLayout.setOnRefreshListener {
+            mSwipeLayout.isRefreshing  = true
             refreshItemsFromTable()
         }
+
+
 
     }
 
@@ -451,7 +458,10 @@ class ToDoActivity : Activity() {
 
 
             runOnUiThread {
-                mSwipeLayout.isRefreshing  = true
+
+                 if (!mSwipeLayout.isRefreshing) {
+                     mProgressBar.visibility = View.VISIBLE
+                 }
             }
 
             val future = nextServiceFilterCallback.onNext(request)
@@ -468,6 +478,7 @@ class ToDoActivity : Activity() {
 
                             // Hide swipe to refresh icon animation
                             mSwipeLayout.isRefreshing  = false
+                            mProgressBar.visibility = View.INVISIBLE
                         }
 
                         // Execute the task after specified time
