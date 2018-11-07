@@ -104,7 +104,7 @@ class ToDoActivity : Activity() {
         mAddButton = findViewById(R.id.buttonAddToDo) as Button
         mProgressBar = findViewById(R.id.progressBar) as ProgressBar
 
-                try {
+        try {
 
             // Extend timeout from default of 10s to 20s
             mClient.setAndroidHttpClientFactory {
