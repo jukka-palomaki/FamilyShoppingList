@@ -58,7 +58,7 @@ class ToDoItemAdapter(
 
             val alert = AlertDialog.Builder(mContext)
             val editTextUpdatedText = EditText(context)
-            editTextUpdatedText.setImeOptions(EditorInfo.IME_ACTION_DONE);
+            editTextUpdatedText.imeOptions = EditorInfo.IME_ACTION_DONE
             editTextUpdatedText.setSingleLine(true)
 
             // Builder

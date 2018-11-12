@@ -1,6 +1,7 @@
 package com.palomaki.familyshoppinglist
 
 
+import android.annotation.SuppressLint
 import java.net.MalformedURLException
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
@@ -35,9 +36,9 @@ import com.microsoft.windowsazure.mobileservices.table.query.QueryOperations.*
 
 import android.content.Context
 import android.content.Intent
-import android.opengl.Visibility
 import android.os.Handler
 import android.support.v4.widget.SwipeRefreshLayout
+import android.util.Log
 import android.widget.*
 
 import com.microsoft.windowsazure.mobileservices.authentication.MobileServiceAuthenticationProvider
@@ -101,8 +102,8 @@ class ToDoActivity : Activity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_to_do)
 
-        mAddButton = findViewById(R.id.buttonAddToDo) as Button
-        mProgressBar = findViewById(R.id.progressBar) as ProgressBar
+        mAddButton = findViewById<Button>(R.id.buttonAddToDo)
+        mProgressBar = findViewById<ProgressBar>(R.id.progressBar)
 
         try {
 
@@ -119,7 +120,7 @@ class ToDoActivity : Activity() {
             //Init local storage
             initLocalStore().get()
 
-            mTextNextShopItem = findViewById(R.id.textNewToDo) as EditText
+            mTextNextShopItem = findViewById<EditText>(R.id.textNewToDo)
 
             // Load the items from the Mobile Service
             refreshItemsFromTable()
@@ -206,7 +207,8 @@ class ToDoActivity : Activity() {
             return
         }
 
-        val task = object : AsyncTask<Void, Void, Void>() {
+        val task = @SuppressLint("StaticFieldLeak")
+        object : AsyncTask<Void, Void, Void>() {
             override fun doInBackground(vararg params: Void): Void? {
                 try {
 
@@ -216,12 +218,13 @@ class ToDoActivity : Activity() {
                             mAdapter.remove(item)
                             toastNotify("${item.text} removed", true, false)
                             refreshItemsFromTable()
+                            Log.i(TAG, "${item.text} removed and list refreshed")
                         } else {
                             mAdapter.sort({x, y -> x.compareTo(y)})
                         }
                     }
                 } catch (e: Exception) {
-                    createAndShowDialogFromTask(e, "Error checkItem")
+                    createAndShowDialogFromTask(e)
                 }
                 return null
             }
@@ -263,7 +266,8 @@ class ToDoActivity : Activity() {
         item.userId = userId
 
         // Insert the new item
-        val task = object : AsyncTask<Void, Void, Void>() {
+        val task = @SuppressLint("StaticFieldLeak")
+        object : AsyncTask<Void, Void, Void>() {
             override fun doInBackground(vararg params: Void): Void? {
                 try {
                     val entity = addItemInTable(item)
@@ -275,7 +279,7 @@ class ToDoActivity : Activity() {
                         }
                     }
                 } catch (e: Exception) {
-                    createAndShowDialogFromTask(e, "Error addItem")
+                    createAndShowDialogFromTask(e)
                 }
 
                 return null
@@ -308,7 +312,8 @@ class ToDoActivity : Activity() {
         // Get the items that weren't marked as completed and add them in the
         // adapter
 
-        val task = object : AsyncTask<Void, Void, Void>() {
+        val task = @SuppressLint("StaticFieldLeak")
+        object : AsyncTask<Void, Void, Void>() {
             override fun doInBackground(vararg params: Void): Void? {
 
                 try {
@@ -322,7 +327,7 @@ class ToDoActivity : Activity() {
                         }
                     }
                 } catch (e: Exception) {
-                    createAndShowDialogFromTask(e, "Error refreshItemsFromTable")
+                    createAndShowDialogFromTask(e)
                 }
 
                 return null
@@ -359,7 +364,8 @@ class ToDoActivity : Activity() {
     @Throws(MobileServiceLocalStoreException::class, ExecutionException::class, InterruptedException::class)
     private fun initLocalStore(): AsyncTask<Void, Void, Void> {
 
-        val task = object : AsyncTask<Void, Void, Void>() {
+        val task = @SuppressLint("StaticFieldLeak")
+        object : AsyncTask<Void, Void, Void>() {
             override fun doInBackground(vararg params: Void): Void? {
                 try {
 
@@ -382,7 +388,7 @@ class ToDoActivity : Activity() {
                     syncContext.initialize(localStore, handler).get()
 
                 } catch (e: Exception) {
-                    createAndShowDialogFromTask(e, "Error initLocalStore")
+                    createAndShowDialogFromTask(e)
                 }
 
                 return null
@@ -397,10 +403,8 @@ class ToDoActivity : Activity() {
      *
      * @param exception
      * The exception to show in the dialog
-     * @param title
-     * The dialog title
      */
-    private fun createAndShowDialogFromTask(exception: Exception, title: String) {
+    private fun createAndShowDialogFromTask(exception: Exception) {
         runOnUiThread { createAndShowDialog(exception, "Error createAndShowDialogFromTask") }
     }
 
@@ -443,11 +447,7 @@ class ToDoActivity : Activity() {
      * @return
      */
     private fun runAsyncTask(task: AsyncTask<Void, Void, Void>): AsyncTask<Void, Void, Void> {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
-        } else {
-            task.execute()
-        }
+        return task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
     }
 
     private inner class ProgressFilter : ServiceFilter {
@@ -501,11 +501,11 @@ class ToDoActivity : Activity() {
         // Get the table instance to use.
         mToDoTable = mClient.getTable(ToDoItem::class.java)
 
-        mTextNextShopItem = findViewById(R.id.textNewToDo) as EditText
+        mTextNextShopItem = findViewById<EditText>(R.id.textNewToDo)
 
         // Create an adapter to bind the items with the view.
         mAdapter = ToDoItemAdapter(this, R.layout.row_list_to_do)
-        val listViewToDo = findViewById(R.id.listViewToDo) as ListView
+        val listViewToDo = findViewById<ListView>(R.id.listViewToDo)
         listViewToDo.adapter = mAdapter
 
         // Load the items from Azure.
@@ -538,7 +538,7 @@ class ToDoActivity : Activity() {
     fun loginLogout() {
 
         if (!mClient.isLoginInProgress) {
-            if (mAdapter == null || mAdapter!!.isEmpty()) {
+            if (mAdapter.isEmpty) {
                 // Sign in using the Google provider.
                 mClient.login(MobileServiceAuthenticationProvider.Google, "familyshoppinglist", GOOGLE_LOGIN_REQUEST_CODE)
                 mAddButton.isEnabled = true
