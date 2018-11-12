@@ -39,9 +39,7 @@ class ToDoItem : Comparable<ToDoItem> {
     /**
      * ToDoItem constructor
      */
-    constructor() {
-
-    }
+    constructor()
 
     override fun toString(): String {
         return text
