@@ -152,7 +152,6 @@ class ToDoActivity : Activity() {
         }
 
 
-
     }
 
 
@@ -216,6 +215,7 @@ class ToDoActivity : Activity() {
                         if (item.isComplete) {
                             mAdapter.remove(item)
                             toastNotify("${item.text} removed", true, false)
+                            refreshItemsFromTable()
                         } else {
                             mAdapter.sort({x, y -> x.compareTo(y)})
                         }
