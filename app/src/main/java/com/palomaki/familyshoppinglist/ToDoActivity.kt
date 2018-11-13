@@ -9,7 +9,6 @@ import java.util.concurrent.TimeUnit
 import android.app.Activity
 import android.app.AlertDialog
 import android.os.AsyncTask
-import android.os.Build
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -47,6 +46,7 @@ import com.microsoft.windowsazure.mobileservices.authentication.MobileServiceUse
 import android.view.Gravity
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
+
 
 
 class ToDoActivity : Activity() {
@@ -104,6 +104,7 @@ class ToDoActivity : Activity() {
 
         mAddButton = findViewById<Button>(R.id.buttonAddToDo)
         mProgressBar = findViewById<ProgressBar>(R.id.progressBar)
+        mAdapter = ToDoItemAdapter(this, R.layout.row_list_to_do)
 
         try {
 
@@ -123,7 +124,9 @@ class ToDoActivity : Activity() {
             mTextNextShopItem = findViewById<EditText>(R.id.textNewToDo)
 
             // Load the items from the Mobile Service
-            refreshItemsFromTable()
+            if (mClient.getCurrentUser() != null) {
+                refreshItemsFromTable()
+            }
 
         } catch (e: MalformedURLException) {
             createAndShowDialog(Exception("There was an error creating the Mobile Service. Verify the URL"), "Error")
@@ -180,6 +183,7 @@ class ToDoActivity : Activity() {
      */
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.activity_main, menu)
+
         return true
     }
 
@@ -190,9 +194,20 @@ class ToDoActivity : Activity() {
         if (item.itemId == R.id.menu_refresh) {
             refreshItemsFromTable()
         } else if (item.itemId == R.id.menu_loginlogout) {
+
             loginLogout()
         }
 
+        return true
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
+        val loginLogoutMenuItem = menu.findItem(R.id.menu_loginlogout)
+        if (mClient.getCurrentUser() != null) {
+            loginLogoutMenuItem.title = "Logout"
+        } else {
+            loginLogoutMenuItem.title = "Login with Google"
+        }
         return true
     }
 
