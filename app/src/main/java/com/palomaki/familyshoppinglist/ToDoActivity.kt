@@ -16,10 +16,6 @@ import android.view.View
 
 import android.widget.EditText
 
-import com.google.common.util.concurrent.FutureCallback
-import com.google.common.util.concurrent.Futures
-import com.google.common.util.concurrent.ListenableFuture
-import com.google.common.util.concurrent.SettableFuture
 import com.microsoft.windowsazure.mobileservices.MobileServiceClient
 import com.microsoft.windowsazure.mobileservices.http.NextServiceFilterCallback
 import com.microsoft.windowsazure.mobileservices.http.ServiceFilter
@@ -46,7 +42,8 @@ import com.microsoft.windowsazure.mobileservices.authentication.MobileServiceUse
 import android.view.Gravity
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
-
+import com.google.common.util.concurrent.*
+import java.util.concurrent.Executor
 
 
 class ToDoActivity : Activity() {
@@ -497,14 +494,12 @@ class ToDoActivity : Activity() {
                         }
 
                         // Execute the task after specified time
-                        mHandler.postDelayed(
-                                mRunnable,
-                                refreshDelay)
+                        mHandler.postDelayed(mRunnable, refreshDelay)
                     }
 
                     resultFuture.set(response)
                 }
-            })
+            }, MoreExecutors.directExecutor())
 
             return resultFuture
         }
