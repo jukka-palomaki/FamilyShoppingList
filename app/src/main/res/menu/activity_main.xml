@@ -4,7 +4,7 @@
         android:title="@string/menu_refresh"
         app:showAsAction="always"></item>
     <item android:id="@+id/menu_loginlogout" android:orderInCategory="101"
-        android:title="@string/loginout_button_text"
+        android:title="@string/login_text"
         app:showAsAction="always"></item>
 
 
