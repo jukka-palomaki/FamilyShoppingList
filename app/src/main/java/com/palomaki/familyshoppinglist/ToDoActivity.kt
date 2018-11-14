@@ -43,8 +43,11 @@ import android.view.Gravity
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import com.google.common.util.concurrent.*
-import java.util.concurrent.Executor
+import java.util.*
+import java.sql.Date
 
+
+val oneWeekMs = 604800000L
 
 class ToDoActivity : Activity() {
 
@@ -56,6 +59,7 @@ class ToDoActivity : Activity() {
     private val textCol = "text"
     private val idCol = "id"
     private val userIdCol = "userId"
+    private val updatedAt = "updatedAt"
 
     /**
      * Mobile Service Client reference
@@ -146,7 +150,7 @@ class ToDoActivity : Activity() {
         mHandler = Handler()
 
         // Set an on refresh listener for swipe refresh layout
-        mSwipeLayout = findViewById(R.id.swipe_refresh_layout)
+        mSwipeLayout = findViewById<SwipeRefreshLayout>(R.id.swipe_refresh_layout)
         mSwipeLayout.setOnRefreshListener {
             mSwipeLayout.isRefreshing  = true
             refreshItemsFromTable()
@@ -227,13 +231,14 @@ class ToDoActivity : Activity() {
                     checkItemInTable(item)
                     runOnUiThread {
                         if (item.isComplete) {
-                            mAdapter.remove(item)
+                            //mAdapter.remove(item)
                             toastNotify("${item.text} removed", true, false)
-                            refreshItemsFromTable()
                             Log.i(TAG, "${item.text} removed and list refreshed")
                         } else {
-                            mAdapter.sort({x, y -> x.compareTo(y)})
+                            //mAdapter.sort({x, y -> x.compareTo(y)})
+                            toastNotify("${item.text} returned to shopping list", true, false)
                         }
+                        refreshItemsFromTable()
                     }
                 } catch (e: Exception) {
                     createAndShowDialogFromTask(e)
@@ -353,16 +358,22 @@ class ToDoActivity : Activity() {
     /**
      * Refresh the list with the items in the Mobile Service Table
      */
-
     @Throws(ExecutionException::class, InterruptedException::class)
     private fun refreshItemsFromMobileServiceTable(): List<ToDoItem> {
 
-        val rows = mToDoTable.
+        /*val rows = mToDoTable.
                 where().field(completeCol).eq(`val`(false)).
                 and().field(userIdCol).eq(`val`(mClient.currentUser.userId))
+                .execute().get()*/
+
+        val rows = mToDoTable.
+                where().field(completeCol).eq(`val`(true))
+                .and().field(userIdCol).eq(`val`(mClient.currentUser.userId))
+                .and().field(updatedAt).ge(`val`(java.sql.Date(System.currentTimeMillis() - oneWeekMs)))
                 .execute().get()
 
-        val rowsSorted = rows.sortedBy { (!it.isHighPriority).toString() + it.text.trim()  }
+
+        val rowsSorted = rows.sortedBy { (it.isComplete).toString() + (!it.isHighPriority).toString() + it.text.trim()  }
         return rowsSorted
     }
 

@@ -50,8 +50,13 @@ class ToDoItem : Comparable<ToDoItem> {
     }
 
     override operator fun compareTo(f: ToDoItem): Int {
-        val prio = f.isHighPriority.compareTo(isHighPriority)
-        return if (prio == 0) text.compareTo(f.text) else prio
+        val completed = isComplete.compareTo(f.isComplete)
+        if (completed == 0) {
+            val prio = f.isHighPriority.compareTo(isHighPriority)
+            return if (prio == 0) text.compareTo(f.text) else prio
+        } else {
+            return completed
+        }
     }
 
 

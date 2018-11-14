@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
 import android.content.DialogInterface
+import android.graphics.Paint
 import android.text.Editable
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +12,9 @@ import android.view.inputmethod.EditorInfo
 import android.widget.ArrayAdapter
 import android.widget.CheckBox
 import android.widget.EditText
+import android.graphics.Paint.STRIKE_THRU_TEXT_FLAG
+
+
 
 
 /**
@@ -47,15 +51,14 @@ class ToDoItemAdapter(
         row.tag = currentItem
         val checkBox = row.findViewById<CheckBox>(R.id.checkToDoItem)
         checkBox.text = currentItem.text.trim()
-        checkBox.isChecked = false
+        checkBox.isChecked = currentItem.isComplete
         checkBox.isEnabled = true
+        checkBox.setPaintFlags(checkBox.getPaintFlags() or Paint.STRIKE_THRU_TEXT_FLAG)
 
         checkBox.setOnClickListener {
-            if (checkBox.isChecked) {
-                checkBox.isEnabled = false
-                currentItem.isComplete = true
-                updateData(currentItem)
-            }
+            checkBox.isEnabled = false
+            currentItem.isComplete = !currentItem.isComplete
+            updateData(currentItem)
         }
 
         checkBox.setOnLongClickListener {
