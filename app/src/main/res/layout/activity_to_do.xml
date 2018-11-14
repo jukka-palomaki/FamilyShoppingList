@@ -22,7 +22,6 @@
             android:ems="10"
             android:imeOptions="actionDone"
             android:hint="@string/add_textbox_hint" >
-
             <requestFocus />
        </EditText>
 
