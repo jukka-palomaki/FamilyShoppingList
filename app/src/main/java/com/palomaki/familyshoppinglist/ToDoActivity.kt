@@ -556,7 +556,6 @@ class ToDoActivity : Activity() {
             if (mAdapter.isEmpty) {
                 // Sign in using the Google provider.
                 mClient.login(MobileServiceAuthenticationProvider.Google, "familyshoppinglist", GOOGLE_LOGIN_REQUEST_CODE)
-                setUiStatus(true)
             } else {
                 val prefs = getSharedPreferences(SHAREDPREFFILE, Context.MODE_PRIVATE)
                 userId = prefs.getString(USERIDPREF, "") ?: return
@@ -576,6 +575,7 @@ class ToDoActivity : Activity() {
         // We first try to load a token cache if one exists.
         if (loadUserTokenCache(mClient)) {
             createTable()
+            setUiStatus(true)
         } else {
             //Else we show an empty table with login button
             mAdapter.clear()
@@ -604,6 +604,7 @@ class ToDoActivity : Activity() {
                     toastNotify("Login succeeded!", false)
                     cacheUserToken(mClient.currentUser)
                     createTable()
+                    setUiStatus(true)
                 } else {
                     // sign-in failed, check the error message
                     mClient.logout()
@@ -612,6 +613,7 @@ class ToDoActivity : Activity() {
                         errorMessage = "Not allowed user"
                     }
                     createAndShowDialog(errorMessage, "Error")
+                    setUiStatus(false)
                 }
             }
         }
