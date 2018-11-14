@@ -105,6 +105,7 @@ class ToDoActivity : Activity() {
         mAddButton = findViewById<Button>(R.id.buttonAddToDo)
         mProgressBar = findViewById<ProgressBar>(R.id.progressBar)
         mAdapter = ToDoItemAdapter(this, R.layout.row_list_to_do)
+        mTextNextShopItem = findViewById<EditText>(R.id.textNewToDo)
 
         try {
 
@@ -121,7 +122,6 @@ class ToDoActivity : Activity() {
             //Init local storage
             initLocalStore().get()
 
-            mTextNextShopItem = findViewById<EditText>(R.id.textNewToDo)
 
             // Load the items from the Mobile Service
             if (mClient.getCurrentUser() != null) {
@@ -183,7 +183,6 @@ class ToDoActivity : Activity() {
      */
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.activity_main, menu)
-
         return true
     }
 
@@ -194,19 +193,20 @@ class ToDoActivity : Activity() {
         if (item.itemId == R.id.menu_refresh) {
             refreshItemsFromTable()
         } else if (item.itemId == R.id.menu_loginlogout) {
-
             loginLogout()
         }
-
         return true
     }
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
         val loginLogoutMenuItem = menu.findItem(R.id.menu_loginlogout)
+        val refreshMenuItem = menu.findItem(R.id.menu_refresh)
         if (mClient.getCurrentUser() != null) {
             loginLogoutMenuItem.title = "Logout"
+            refreshMenuItem.isEnabled = true
         } else {
             loginLogoutMenuItem.title = "Login with Google"
+            refreshMenuItem.isEnabled = false
         }
         return true
     }
@@ -556,7 +556,7 @@ class ToDoActivity : Activity() {
             if (mAdapter.isEmpty) {
                 // Sign in using the Google provider.
                 mClient.login(MobileServiceAuthenticationProvider.Google, "familyshoppinglist", GOOGLE_LOGIN_REQUEST_CODE)
-                mAddButton.isEnabled = true
+                setUiStatus(true)
             } else {
                 val prefs = getSharedPreferences(SHAREDPREFFILE, Context.MODE_PRIVATE)
                 userId = prefs.getString(USERIDPREF, "") ?: return
@@ -566,7 +566,7 @@ class ToDoActivity : Activity() {
                 mClient.logout()
                 mAdapter.clear()
                 toastNotify("Logged out", false)
-                mAddButton.isEnabled = false
+                setUiStatus(false)
 
             }
         }
@@ -579,7 +579,17 @@ class ToDoActivity : Activity() {
         } else {
             //Else we show an empty table with login button
             mAdapter.clear()
+            setUiStatus(false)
         }
+    }
+
+    private fun setUiStatus(loggedIn: Boolean) {
+        mAddButton.isEnabled = loggedIn
+        mTextNextShopItem.isEnabled = loggedIn
+        if (loggedIn)
+            mTextNextShopItem.setHint(getString(R.string.add_textbox_hint))
+        else
+            mTextNextShopItem.setHint(getString(R.string.logged_out_hint))
     }
 
 
