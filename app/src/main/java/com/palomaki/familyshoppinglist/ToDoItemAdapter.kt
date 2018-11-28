@@ -53,7 +53,9 @@ class ToDoItemAdapter(
         checkBox.text = currentItem.text.trim()
         checkBox.isChecked = currentItem.isComplete
         checkBox.isEnabled = true
-        checkBox.setPaintFlags(checkBox.getPaintFlags() or Paint.STRIKE_THRU_TEXT_FLAG)
+        if (currentItem.isComplete) {
+            checkBox.setPaintFlags(checkBox.getPaintFlags() or Paint.STRIKE_THRU_TEXT_FLAG)
+        }
 
         checkBox.setOnClickListener {
             checkBox.isEnabled = false
