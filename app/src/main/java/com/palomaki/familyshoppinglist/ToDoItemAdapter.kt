@@ -49,13 +49,10 @@ class ToDoItemAdapter(
         }
 
         row.tag = currentItem
-        val checkBox = row.findViewById<CheckBox>(R.id.checkToDoItem)
+        val checkBox: CheckBox = row.findViewById(R.id.checkToDoItem)
         checkBox.text = currentItem.text.trim()
         checkBox.isChecked = currentItem.isComplete
         checkBox.isEnabled = true
-        if (currentItem.isComplete) {
-            checkBox.setPaintFlags(checkBox.getPaintFlags() or Paint.STRIKE_THRU_TEXT_FLAG)
-        }
 
         checkBox.setOnClickListener {
             checkBox.isEnabled = false
