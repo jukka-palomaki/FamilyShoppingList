@@ -47,6 +47,7 @@ import java.util.*
 
 
 val oneDayMs = 1000*60*60*24L
+var modeShowTrashBin = false
 
 class ToDoActivity : Activity() {
 
@@ -60,7 +61,6 @@ class ToDoActivity : Activity() {
     private val userIdCol = "userId"
     private val updatedAt = "updatedAt"
 
-    private var modeShowTrashBin = false
 
     /**
      * Mobile Service Client reference
@@ -97,6 +97,8 @@ class ToDoActivity : Activity() {
 
     private lateinit var mProgressBar: ProgressBar
 
+    private lateinit var mListViewToDo: ListView
+
     /**
      * Initializes the activity
      */
@@ -104,10 +106,11 @@ class ToDoActivity : Activity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_to_do)
 
-        mAddButton = findViewById<Button>(R.id.buttonAddToDo)
-        mProgressBar = findViewById<ProgressBar>(R.id.progressBar)
+        mAddButton = findViewById(R.id.buttonAddToDo)
+        mProgressBar = findViewById(R.id.progressBar)
         mAdapter = ToDoItemAdapter(this, R.layout.row_list_to_do)
-        mTextNextShopItem = findViewById<EditText>(R.id.textNewToDo)
+        mTextNextShopItem = findViewById(R.id.textNewToDo)
+        mListViewToDo = findViewById(R.id.listViewToDo)
 
         try {
 
@@ -151,10 +154,11 @@ class ToDoActivity : Activity() {
         mHandler = Handler()
 
         // Set an on refresh listener for swipe refresh layout
-        mSwipeLayout = findViewById<SwipeRefreshLayout>(R.id.swipe_refresh_layout)
+        mSwipeLayout = findViewById(R.id.swipe_refresh_layout)
         mSwipeLayout.setOnRefreshListener {
             mSwipeLayout.isRefreshing  = true
             refreshItemsFromTable()
+            mListViewToDo.setSelection(0)
         }
 
 
@@ -193,7 +197,10 @@ class ToDoActivity : Activity() {
      */
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId) {
-            R.id.menu_refresh -> refreshItemsFromTable()
+            R.id.menu_refresh -> {
+                refreshItemsFromTable()
+                mListViewToDo.setSelection(0)
+            }
             R.id.menu_loginlogout -> loginLogout()
             R.id.menu_trashbin -> {
                 item.isChecked = !item.isChecked
@@ -212,6 +219,7 @@ class ToDoActivity : Activity() {
             loginLogoutMenuItem.title = "Logout"
             refreshMenuItem.isEnabled = true
             trashMenuItem.isEnabled = true
+            trashMenuItem.isChecked = modeShowTrashBin
         } else {
             loginLogoutMenuItem.title = "Login with Google"
             refreshMenuItem.isEnabled = false
@@ -334,7 +342,6 @@ class ToDoActivity : Activity() {
 
         // Get the items that weren't marked as completed and add them in the
         // adapter
-
         val task = @SuppressLint("StaticFieldLeak")
         object : AsyncTask<Void, Void, Void>() {
             override fun doInBackground(vararg params: Void): Void? {
@@ -536,8 +543,7 @@ class ToDoActivity : Activity() {
 
         // Create an adapter to bind the items with the view.
         mAdapter = ToDoItemAdapter(this, R.layout.row_list_to_do)
-        val listViewToDo = findViewById<ListView>(R.id.listViewToDo)
-        listViewToDo.adapter = mAdapter
+        mListViewToDo.adapter = mAdapter
 
         // Load the items from Azure.
         refreshItemsFromTable()
