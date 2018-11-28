@@ -44,10 +44,9 @@ import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import com.google.common.util.concurrent.*
 import java.util.*
-import java.sql.Date
 
 
-val oneWeekMs = 604800000L
+val oneDayMs = 1000*60*60*24L
 
 class ToDoActivity : Activity() {
 
@@ -60,6 +59,8 @@ class ToDoActivity : Activity() {
     private val idCol = "id"
     private val userIdCol = "userId"
     private val updatedAt = "updatedAt"
+
+    private var modeShowTrashBin = false
 
     /**
      * Mobile Service Client reference
@@ -191,10 +192,14 @@ class ToDoActivity : Activity() {
      * Select an option from the menu
      */
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == R.id.menu_refresh) {
-            refreshItemsFromTable()
-        } else if (item.itemId == R.id.menu_loginlogout) {
-            loginLogout()
+        when(item.itemId) {
+            R.id.menu_refresh -> refreshItemsFromTable()
+            R.id.menu_loginlogout -> loginLogout()
+            R.id.menu_trashbin -> {
+                item.isChecked = !item.isChecked
+                modeShowTrashBin = item.isChecked
+                refreshItemsFromTable()
+            }
         }
         return true
     }
@@ -202,12 +207,15 @@ class ToDoActivity : Activity() {
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
         val loginLogoutMenuItem = menu.findItem(R.id.menu_loginlogout)
         val refreshMenuItem = menu.findItem(R.id.menu_refresh)
+        val trashMenuItem = menu.findItem(R.id.menu_trashbin)
         if (mClient.getCurrentUser() != null) {
             loginLogoutMenuItem.title = "Logout"
             refreshMenuItem.isEnabled = true
+            trashMenuItem.isEnabled = true
         } else {
             loginLogoutMenuItem.title = "Login with Google"
             refreshMenuItem.isEnabled = false
+            trashMenuItem.isEnabled = false
         }
         return true
     }
@@ -231,11 +239,9 @@ class ToDoActivity : Activity() {
                     checkItemInTable(item)
                     runOnUiThread {
                         if (item.isComplete) {
-                            //mAdapter.remove(item)
                             toastNotify("${item.text} removed", true, false)
                             Log.i(TAG, "${item.text} removed and list refreshed")
                         } else {
-                            //mAdapter.sort({x, y -> x.compareTo(y)})
                             toastNotify("${item.text} returned to shopping list", true, false)
                         }
                         refreshItemsFromTable()
@@ -361,19 +367,23 @@ class ToDoActivity : Activity() {
     @Throws(ExecutionException::class, InterruptedException::class)
     private fun refreshItemsFromMobileServiceTable(): List<ToDoItem> {
 
-        /*val rows = mToDoTable.
-                where().field(completeCol).eq(`val`(false)).
-                and().field(userIdCol).eq(`val`(mClient.currentUser.userId))
-                .execute().get()*/
+        var rows = mToDoTable.where().field(completeCol).eq(`val`(false))
+                    .and().field(userIdCol).eq(`val`(mClient.currentUser.userId))
+                    .execute().get()
 
-        val rows = mToDoTable.
-                where().field(completeCol).eq(`val`(true))
-                .and().field(userIdCol).eq(`val`(mClient.currentUser.userId))
-                .and().field(updatedAt).ge(`val`(java.sql.Date(System.currentTimeMillis() - oneWeekMs)))
-                .execute().get()
+        if (modeShowTrashBin) {
+            var trashRows = mToDoTable.where().field(completeCol).eq(`val`(true))
+                    .and().field(userIdCol).eq(`val`(mClient.currentUser.userId))
+                    .and().field(updatedAt).ge(`val`(java.sql.Date(System.currentTimeMillis() - oneDayMs)))
+                    .execute().get()
+            if (trashRows.size > 0) {
+                rows.addAll(trashRows)
+            }
+        }
 
-
-        val rowsSorted = rows.sortedBy { (it.isComplete).toString() + (!it.isHighPriority).toString() + it.text.trim()  }
+        val rowsSorted = rows.sortedBy {
+            (it.isComplete).toString() + (!it.isHighPriority).toString() + it.text.trim()
+        }
         return rowsSorted
     }
 
@@ -572,7 +582,6 @@ class ToDoActivity : Activity() {
                 mAdapter.clear()
                 toastNotify("Logged out", false)
                 setUiStatus(false)
-
             }
         }
     }

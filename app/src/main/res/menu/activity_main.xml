@@ -6,6 +6,11 @@
     <item android:id="@+id/menu_loginlogout" android:orderInCategory="101"
         android:title="@string/login_text"
         app:showAsAction="always"></item>
+    <item android:id="@+id/menu_trashbin" android:orderInCategory="101"
+        android:title="@string/trash_bin"
+        android:checkable="true"
+        android:checked="false"
+        app:showAsAction="always"></item>
 
 
 </menu>
