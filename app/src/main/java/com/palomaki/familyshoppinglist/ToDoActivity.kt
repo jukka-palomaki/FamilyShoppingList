@@ -43,8 +43,11 @@ import android.view.Gravity
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import com.google.common.util.concurrent.*
-import java.util.concurrent.Executor
+import java.util.*
 
+
+val oneDayMs = 1000*60*60*24L
+var modeShowTrashBin = false
 
 class ToDoActivity : Activity() {
 
@@ -56,6 +59,8 @@ class ToDoActivity : Activity() {
     private val textCol = "text"
     private val idCol = "id"
     private val userIdCol = "userId"
+    private val updatedAt = "updatedAt"
+
 
     /**
      * Mobile Service Client reference
@@ -92,6 +97,8 @@ class ToDoActivity : Activity() {
 
     private lateinit var mProgressBar: ProgressBar
 
+    private lateinit var mListViewToDo: ListView
+
     /**
      * Initializes the activity
      */
@@ -99,10 +106,11 @@ class ToDoActivity : Activity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_to_do)
 
-        mAddButton = findViewById<Button>(R.id.buttonAddToDo)
-        mProgressBar = findViewById<ProgressBar>(R.id.progressBar)
+        mAddButton = findViewById(R.id.buttonAddToDo)
+        mProgressBar = findViewById(R.id.progressBar)
         mAdapter = ToDoItemAdapter(this, R.layout.row_list_to_do)
-        mTextNextShopItem = findViewById<EditText>(R.id.textNewToDo)
+        mTextNextShopItem = findViewById(R.id.textNewToDo)
+        mListViewToDo = findViewById(R.id.listViewToDo)
 
         try {
 
@@ -132,7 +140,7 @@ class ToDoActivity : Activity() {
         }
 
 
-        findViewById<EditText>(R.id.textNewToDo).setOnEditorActionListener { v, actionId, event ->
+        mTextNextShopItem.setOnEditorActionListener { v, actionId, event ->
             return@setOnEditorActionListener when (actionId) {
                 EditorInfo.IME_ACTION_DONE -> {
                     addItem(v)
@@ -151,7 +159,6 @@ class ToDoActivity : Activity() {
             mSwipeLayout.isRefreshing  = true
             refreshItemsFromTable()
         }
-
 
     }
 
@@ -187,10 +194,17 @@ class ToDoActivity : Activity() {
      * Select an option from the menu
      */
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == R.id.menu_refresh) {
-            refreshItemsFromTable()
-        } else if (item.itemId == R.id.menu_loginlogout) {
-            loginLogout()
+        when(item.itemId) {
+            R.id.menu_refresh -> {
+                refreshItemsFromTable()
+                mListViewToDo.setSelection(0)
+            }
+            R.id.menu_loginlogout -> loginLogout()
+            R.id.menu_trashbin -> {
+                item.isChecked = !item.isChecked
+                modeShowTrashBin = item.isChecked
+                refreshItemsFromTable()
+            }
         }
         return true
     }
@@ -198,12 +212,16 @@ class ToDoActivity : Activity() {
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
         val loginLogoutMenuItem = menu.findItem(R.id.menu_loginlogout)
         val refreshMenuItem = menu.findItem(R.id.menu_refresh)
+        val trashMenuItem = menu.findItem(R.id.menu_trashbin)
         if (mClient.getCurrentUser() != null) {
             loginLogoutMenuItem.title = "Logout"
             refreshMenuItem.isEnabled = true
+            trashMenuItem.isEnabled = true
+            trashMenuItem.isChecked = modeShowTrashBin
         } else {
             loginLogoutMenuItem.title = "Login with Google"
             refreshMenuItem.isEnabled = false
+            trashMenuItem.isEnabled = false
         }
         return true
     }
@@ -227,13 +245,12 @@ class ToDoActivity : Activity() {
                     checkItemInTable(item)
                     runOnUiThread {
                         if (item.isComplete) {
-                            mAdapter.remove(item)
                             toastNotify("${item.text} removed", true, false)
-                            refreshItemsFromTable()
                             Log.i(TAG, "${item.text} removed and list refreshed")
                         } else {
-                            mAdapter.sort({x, y -> x.compareTo(y)})
+                            toastNotify("${item.text} returned to shopping list", true, false)
                         }
+                        refreshItemsFromTable()
                     }
                 } catch (e: Exception) {
                     createAndShowDialogFromTask(e)
@@ -323,7 +340,6 @@ class ToDoActivity : Activity() {
 
         // Get the items that weren't marked as completed and add them in the
         // adapter
-
         val task = @SuppressLint("StaticFieldLeak")
         object : AsyncTask<Void, Void, Void>() {
             override fun doInBackground(vararg params: Void): Void? {
@@ -353,16 +369,26 @@ class ToDoActivity : Activity() {
     /**
      * Refresh the list with the items in the Mobile Service Table
      */
-
     @Throws(ExecutionException::class, InterruptedException::class)
     private fun refreshItemsFromMobileServiceTable(): List<ToDoItem> {
 
-        val rows = mToDoTable.
-                where().field(completeCol).eq(`val`(false)).
-                and().field(userIdCol).eq(`val`(mClient.currentUser.userId))
-                .execute().get()
+        var rows = mToDoTable.where().field(completeCol).eq(`val`(false))
+                    .and().field(userIdCol).eq(`val`(mClient.currentUser.userId))
+                    .execute().get()
 
-        val rowsSorted = rows.sortedBy { (!it.isHighPriority).toString() + it.text.trim()  }
+        if (modeShowTrashBin) {
+            var trashRows = mToDoTable.where().field(completeCol).eq(`val`(true))
+                    .and().field(userIdCol).eq(`val`(mClient.currentUser.userId))
+                    .and().field(updatedAt).ge(`val`(java.sql.Date(System.currentTimeMillis() - oneDayMs)))
+                    .execute().get()
+            if (trashRows.size > 0) {
+                rows.addAll(trashRows)
+            }
+        }
+
+        val rowsSorted = rows.sortedBy {
+            (it.isComplete).toString() + (!it.isHighPriority).toString() + it.text.trim()
+        }
         return rowsSorted
     }
 
@@ -515,8 +541,7 @@ class ToDoActivity : Activity() {
 
         // Create an adapter to bind the items with the view.
         mAdapter = ToDoItemAdapter(this, R.layout.row_list_to_do)
-        val listViewToDo = findViewById<ListView>(R.id.listViewToDo)
-        listViewToDo.adapter = mAdapter
+        mListViewToDo.adapter = mAdapter
 
         // Load the items from Azure.
         refreshItemsFromTable()
@@ -561,7 +586,6 @@ class ToDoActivity : Activity() {
                 mAdapter.clear()
                 toastNotify("Logged out", false)
                 setUiStatus(false)
-
             }
         }
     }
@@ -581,10 +605,11 @@ class ToDoActivity : Activity() {
     private fun setUiStatus(loggedIn: Boolean) {
         mAddButton.isEnabled = loggedIn
         mTextNextShopItem.isEnabled = loggedIn
-        if (loggedIn)
+        if (loggedIn) {
             mTextNextShopItem.setHint(getString(R.string.add_textbox_hint))
-        else
+        } else {
             mTextNextShopItem.setHint(getString(R.string.logged_out_hint))
+        }
     }
 
 
