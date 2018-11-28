@@ -140,7 +140,7 @@ class ToDoActivity : Activity() {
         }
 
 
-        findViewById<EditText>(R.id.textNewToDo).setOnEditorActionListener { v, actionId, event ->
+        mTextNextShopItem.setOnEditorActionListener { v, actionId, event ->
             return@setOnEditorActionListener when (actionId) {
                 EditorInfo.IME_ACTION_DONE -> {
                     addItem(v)
@@ -158,9 +158,7 @@ class ToDoActivity : Activity() {
         mSwipeLayout.setOnRefreshListener {
             mSwipeLayout.isRefreshing  = true
             refreshItemsFromTable()
-            mListViewToDo.setSelection(0)
         }
-
 
     }
 
@@ -607,10 +605,11 @@ class ToDoActivity : Activity() {
     private fun setUiStatus(loggedIn: Boolean) {
         mAddButton.isEnabled = loggedIn
         mTextNextShopItem.isEnabled = loggedIn
-        if (loggedIn)
+        if (loggedIn) {
             mTextNextShopItem.setHint(getString(R.string.add_textbox_hint))
-        else
+        } else {
             mTextNextShopItem.setHint(getString(R.string.logged_out_hint))
+        }
     }
 
 
