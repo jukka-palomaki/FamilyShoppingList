@@ -232,7 +232,7 @@ class ToDoActivity : Activity() {
      * @param item
      * The item to mark
      */
-    fun updateItem(item: ToDoItem) {
+    fun updateItem(item: ToDoItem, message: String) {
         if (mClient == null) {
             return
         }
@@ -244,12 +244,8 @@ class ToDoActivity : Activity() {
 
                     checkItemInTable(item)
                     runOnUiThread {
-                        if (item.isComplete) {
-                            toastNotify("${item.text} removed", true, false)
-                            Log.i(TAG, "${item.text} removed and list refreshed")
-                        } else {
-                            toastNotify("${item.text} returned to shopping list", true, false)
-                        }
+                        toastNotify(message, true, false)
+                        Log.i(TAG, "${item.text} updated and list refreshed")
                         refreshItemsFromTable()
                     }
                 } catch (e: Exception) {
