@@ -53,7 +53,7 @@ class ToDoActivity : Activity() {
 
     private val TAG = "ToDoActivity"
 
-    private val appUrl = "https://familyshoppinglist.azurewebsites.net"
+    private val appUrl = "https://quickshoppinglist.azurewebsites.net"
 
     private val completeCol = "complete"
     private val textCol = "text"
@@ -575,7 +575,7 @@ class ToDoActivity : Activity() {
         if (!mClient.isLoginInProgress) {
             if (mAdapter.isEmpty) {
                 // Sign in using the Google provider.
-                mClient.login(MobileServiceAuthenticationProvider.Google, "familyshoppinglist", GOOGLE_LOGIN_REQUEST_CODE)
+                mClient.login(MobileServiceAuthenticationProvider.Google, "simpleshoppinglist", GOOGLE_LOGIN_REQUEST_CODE)
             } else {
                 val prefs = getSharedPreferences(SHAREDPREFFILE, Context.MODE_PRIVATE)
                 userId = prefs.getString(USERIDPREF, "") ?: return
