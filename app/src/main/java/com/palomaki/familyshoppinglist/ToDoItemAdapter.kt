@@ -57,7 +57,14 @@ class ToDoItemAdapter(
         checkBox.setOnClickListener {
             checkBox.isEnabled = false
             currentItem.isComplete = !currentItem.isComplete
-            updateData(currentItem)
+            var msg : String = ""
+            if (currentItem.isComplete) {
+                msg = "${currentItem.text} collected"
+            } else {
+                msg = "${currentItem.text} returned to shopping list"
+            }
+
+            updateData(currentItem, msg)
         }
 
         checkBox.setOnLongClickListener {
@@ -78,7 +85,7 @@ class ToDoItemAdapter(
                 }
                 checkBox.text = newValue
                 currentItem.text = newValue
-                updateData(currentItem)
+                updateData(currentItem, "")
                 dialog.dismiss()
             }
 
@@ -116,16 +123,16 @@ class ToDoItemAdapter(
 
         checkBoxPriority.setOnClickListener {
             currentItem.isHighPriority = checkBoxPriority.isChecked
-            updateData(currentItem)
+            updateData(currentItem, "")
         }
 
         return row
     }
 
-    private fun updateData(currentItem: ToDoItem) {
+    private fun updateData(currentItem: ToDoItem, message: String) {
         if (mContext is ToDoActivity) {
             val activity = mContext as ToDoActivity
-            activity.updateItem(currentItem)
+            activity.updateItem(currentItem, message)
         }
     }
 
