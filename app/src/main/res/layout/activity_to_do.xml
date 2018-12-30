@@ -3,64 +3,53 @@
     android:id="@+id/LinearLayout1"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    >
-
+    android:orientation="vertical">
 
      <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#71BCFA"
+        android:background="#8dc9fb"
         android:padding="6dip"  >
 
-        <EditText
-            android:id="@+id/textNewToDo"
-            android:layout_width="0dip"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:inputType="text"
-            android:ems="10"
-            android:imeOptions="actionDone"
-            android:hint="@string/add_textbox_hint" >
-            <requestFocus />
-       </EditText>
-
-        <Button
+         <EditText
+             android:id="@+id/textNewToDo"
+             android:layout_width="0dip"
+             android:layout_height="wrap_content"
+             android:layout_weight="1"
+             android:paddingVertical="11dp"
+             android:ems="10"
+             android:hint="@string/add_textbox_hint"
+             android:imeOptions="actionDone"
+             android:inputType="text">
+             <requestFocus />
+         </EditText>
+         <Button
             android:id="@+id/buttonAddToDo"
             android:layout_width="64dip"
             android:layout_height="wrap_content"
             android:onClick="addItem"
             android:text="@string/add_button_text" />
-
     </LinearLayout>
 
-
-        <RelativeLayout
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <ProgressBar android:id="@+id/progressBar"
+            android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-            <ProgressBar android:id="@+id/progressBar"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:layout_centerInParent="true"
-                android:visibility="invisible" />
-            <android.support.v4.widget.SwipeRefreshLayout
-                android:id="@+id/swipe_refresh_layout"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                >
+            android:layout_centerInParent="true"
+            android:visibility="invisible" />
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/swipe_refresh_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
             <ListView
                 android:id="@+id/listViewToDo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 tools:listitem="@layout/row_list_to_do"
                 android:padding="6dip" >
-
             </ListView>
-            </android.support.v4.widget.SwipeRefreshLayout>
-        </RelativeLayout>
-
-
-
-
-
+        </android.support.v4.widget.SwipeRefreshLayout>
+    </RelativeLayout>
 </LinearLayout>
