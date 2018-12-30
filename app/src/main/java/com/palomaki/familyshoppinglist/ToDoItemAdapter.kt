@@ -50,7 +50,8 @@ class ToDoItemAdapter(
 
         row.tag = currentItem
         val checkBox: CheckBox = row.findViewById(R.id.checkToDoItem) as CheckBox
-        checkBox.text = currentItem.text.trim()
+        val editText: EditText = row.findViewById(R.id.editTextToDoItem) as EditText
+        editText.setText(currentItem.text.trim())
         checkBox.isChecked = currentItem.isComplete
         checkBox.isEnabled = true
 
@@ -65,57 +66,6 @@ class ToDoItemAdapter(
             }
 
             updateData(currentItem, msg)
-        }
-
-        checkBox.setOnLongClickListener {
-
-            val alert = AlertDialog.Builder(mContext)
-            val editTextUpdatedText = EditText(context)
-            val dialog = alert.create()
-
-            editTextUpdatedText.imeOptions = EditorInfo.IME_ACTION_DONE
-            editTextUpdatedText.setSingleLine(true)
-
-            fun doEditActions() {
-                val newValue = editTextUpdatedText.text.toString().trim()
-
-                if (newValue.isEmpty()) { // when updated to empty text that is same as delete task
-                    currentItem.isComplete = true
-                    checkBox.isChecked = true
-                }
-                checkBox.text = newValue
-                currentItem.text = newValue
-                updateData(currentItem, "")
-                dialog.dismiss()
-            }
-
-            editTextUpdatedText.setOnEditorActionListener { v, actionId, event ->
-                return@setOnEditorActionListener when (actionId) {
-                    EditorInfo.IME_ACTION_DONE -> {
-                        doEditActions()
-                        true
-                    }
-                    else -> false
-                }
-            }
-
-            with (alert) {
-                editTextUpdatedText.text = Editable.Factory.getInstance().newEditable(checkBox.text.toString())
-
-                setPositiveButton("Update") {
-                    dialog, whichButton ->
-                        doEditActions()
-                }
-
-                setNegativeButton("Keep original") {
-                    dialog, whichButton -> dialog.dismiss()
-                }
-            }
-
-            dialog.setView(editTextUpdatedText)
-            dialog.show()
-
-            true
         }
 
         val checkBoxPriority = row.findViewById(R.id.checkPriority) as CheckBox
