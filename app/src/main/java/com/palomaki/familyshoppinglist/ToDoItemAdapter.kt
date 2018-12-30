@@ -49,7 +49,7 @@ class ToDoItemAdapter(
         }
 
         row.tag = currentItem
-        val checkBox: CheckBox = row.findViewById(R.id.checkToDoItem)
+        val checkBox: CheckBox = row.findViewById(R.id.checkToDoItem) as CheckBox
         checkBox.text = currentItem.text.trim()
         checkBox.isChecked = currentItem.isComplete
         checkBox.isEnabled = true
