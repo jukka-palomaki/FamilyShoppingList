@@ -19,6 +19,7 @@
         android:layout_height="32dp"
         android:layout_toEndOf="@id/checkToDoItem"
         android:gravity="center_vertical"
+        android:textSize="17sp"
         android:text="@string/checkbox_text" />
 
     <CheckBox
