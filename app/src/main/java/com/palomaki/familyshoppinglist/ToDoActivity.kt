@@ -526,7 +526,7 @@ class ToDoActivity : Activity() {
         }
     }
 
-    val COUNTRIES = arrayOf("Belgium", "France", "Italy", "Germany", "Spain")
+    val COUNTRIES = arrayOf("")//"Belgium", "France", "Italy", "Germany", "Spain")
 
     private fun createTable() {
 
