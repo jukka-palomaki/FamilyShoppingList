@@ -14,8 +14,6 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 
-import android.widget.EditText
-
 import com.microsoft.windowsazure.mobileservices.MobileServiceClient
 import com.microsoft.windowsazure.mobileservices.http.NextServiceFilterCallback
 import com.microsoft.windowsazure.mobileservices.http.ServiceFilter
@@ -81,7 +79,7 @@ class ToDoActivity : Activity() {
      */
     private lateinit var mAdapter: ToDoItemAdapter
 
-    private lateinit var mTextNextShopItem: EditText
+    private lateinit var mTextNextShopItem: AutoCompleteTextView
 
     private lateinit var mSwipeLayout: SwipeRefreshLayout
 
@@ -527,13 +525,16 @@ class ToDoActivity : Activity() {
         }
     }
 
+    val COUNTRIES = arrayOf("Belgium", "France", "Italy", "Germany", "Spain")
 
     private fun createTable() {
 
         // Get the table instance to use.
         mToDoTable = mClient.getTable(ToDoItem::class.java)
 
-        mTextNextShopItem = findViewById<EditText>(R.id.textNewToDo)
+        mTextNextShopItem = findViewById(R.id.textNewToDo)
+        val adapter: ArrayAdapter<String> =  ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, COUNTRIES);
+        mTextNextShopItem.setAdapter(adapter);
 
         // Create an adapter to bind the items with the view.
         mAdapter = ToDoItemAdapter(this, R.layout.row_list_to_do)

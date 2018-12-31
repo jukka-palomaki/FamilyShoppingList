@@ -11,7 +11,7 @@
         android:background="#8dc9fb"
         android:padding="6dip"  >
 
-         <EditText
+         <AutoCompleteTextView
              android:id="@+id/textNewToDo"
              android:layout_width="0dip"
              android:layout_height="wrap_content"
@@ -22,7 +22,7 @@
              android:imeOptions="actionDone"
              android:inputType="text">
              <requestFocus />
-         </EditText>
+         </AutoCompleteTextView>
          <Button
             android:id="@+id/buttonAddToDo"
             android:layout_width="64dip"
