@@ -13,8 +13,7 @@ import android.widget.ArrayAdapter
 import android.widget.CheckBox
 import android.widget.EditText
 import android.graphics.Paint.STRIKE_THRU_TEXT_FLAG
-
-
+import android.widget.TextView
 
 
 /**
@@ -50,8 +49,8 @@ class ToDoItemAdapter(
 
         row.tag = currentItem
         val checkBox: CheckBox = row.findViewById(R.id.checkToDoItem) as CheckBox
-        val editText: EditText = row.findViewById(R.id.editTextToDoItem) as EditText
-        editText.setText(currentItem.text.trim())
+        val checkText: TextView = row.findViewById(R.id.labelToDoItem) as TextView
+        checkText.text = currentItem.text.trim()
         checkBox.isChecked = currentItem.isComplete
         checkBox.isEnabled = true
 
