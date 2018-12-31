@@ -48,7 +48,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 tools:listitem="@layout/row_list_to_do"
-                android:padding="6dip" >
+                android:padding="3dip" >
             </ListView>
         </android.support.v4.widget.SwipeRefreshLayout>
     </RelativeLayout>
