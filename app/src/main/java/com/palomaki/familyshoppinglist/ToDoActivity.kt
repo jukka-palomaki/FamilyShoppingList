@@ -39,6 +39,7 @@ import com.microsoft.windowsazure.mobileservices.authentication.MobileServiceUse
 
 import android.view.Gravity
 import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import com.google.common.util.concurrent.*
 import java.util.*
@@ -607,6 +608,17 @@ class ToDoActivity : Activity() {
         } else {
             mTextNextShopItem.setHint(getString(R.string.logged_out_hint))
         }
+    }
+
+    fun hideKeyboard(activity: Activity) {
+        val imm = activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        //Find the currently focused view, so we can grab the correct window token from it.
+        var view: View = activity.currentFocus
+        //If no view currently has focus, create a new one, just so we can grab a window token from it
+        if (view == null) {
+            view = View(activity);
+        }
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
 
