@@ -3,8 +3,6 @@ package com.palomaki.familyshoppinglist
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
-import android.content.DialogInterface
-import android.graphics.Paint
 import android.text.Editable
 import android.view.View
 import android.view.ViewGroup
@@ -12,8 +10,8 @@ import android.view.inputmethod.EditorInfo
 import android.widget.ArrayAdapter
 import android.widget.CheckBox
 import android.widget.EditText
-import android.graphics.Paint.STRIKE_THRU_TEXT_FLAG
 import android.widget.TextView
+import android.view.inputmethod.InputMethodManager
 
 
 /**
@@ -75,6 +73,17 @@ class ToDoItemAdapter(
 
             editTextUpdatedText.imeOptions = EditorInfo.IME_ACTION_DONE
             editTextUpdatedText.setSingleLine(true)
+            editTextUpdatedText.text = Editable.Factory.getInstance().newEditable(checkText.text.toString())
+            dialog.setView(editTextUpdatedText)
+            dialog.show()
+
+            //We have to close keyboard first so that we can force it up again here
+            val activity = mContext as ToDoActivity
+            activity.hideKeyboard(activity)
+            editTextUpdatedText.requestFocus()
+            val imm = dialog.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
+
 
             fun doEditActions() {
                 val newValue = editTextUpdatedText.text.toString().trim()
@@ -98,22 +107,6 @@ class ToDoItemAdapter(
                     else -> false
                 }
             }
-
-            with (alert) {
-                editTextUpdatedText.text = Editable.Factory.getInstance().newEditable(checkText.text.toString())
-
-                setPositiveButton("Update") {
-                    dialog, whichButton ->
-                    doEditActions()
-                }
-
-                setNegativeButton("Keep original") {
-                    dialog, whichButton -> dialog.dismiss()
-                }
-            }
-
-            dialog.setView(editTextUpdatedText)
-            dialog.show()
 
             true
         }
