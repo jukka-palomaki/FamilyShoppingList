@@ -3,14 +3,18 @@
     <item android:id="@+id/menu_refresh" android:orderInCategory="101"
         android:title="@string/menu_refresh"
         app:showAsAction="always"></item>
-    <item android:id="@+id/menu_loginlogout" android:orderInCategory="101"
-        android:title="@string/login_text"
+    <item android:id="@+id/menu_create_group" android:orderInCategory="101"
+        android:title="@string/create_group_text"
         app:showAsAction="always"></item>
     <item android:id="@+id/menu_trashbin" android:orderInCategory="101"
         android:title="@string/trash_bin"
         android:checkable="true"
         android:checked="false"
         app:showAsAction="always"></item>
+    <item android:id="@+id/menu_loginlogout" android:orderInCategory="101"
+        android:title="@string/login_text"
+        app:showAsAction="always"></item>
+
 
 
 </menu>

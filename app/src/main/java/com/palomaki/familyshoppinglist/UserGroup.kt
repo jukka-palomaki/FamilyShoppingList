@@ -3,7 +3,7 @@ package com.palomaki.familyshoppinglist
 /**
  * Represents an item in a ToDo list
  */
-class UserGroupItem {
+class UserGroup {
 
     /**
      * Unique id for the group
@@ -19,8 +19,8 @@ class UserGroupItem {
 
 
     /**
-     * UserGroupItem constructor
+     * UserGroup constructor
      */
     constructor()
 
-    }
+}

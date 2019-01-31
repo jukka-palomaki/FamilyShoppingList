@@ -29,6 +29,9 @@ import com.microsoft.windowsazure.mobileservices.table.query.QueryOperations.*
 
 import android.content.Context
 import android.content.Intent
+import android.location.Location
+import android.location.LocationListener
+import android.location.LocationManager
 import android.os.Handler
 import android.support.v4.widget.SwipeRefreshLayout
 import android.util.Log
@@ -47,6 +50,7 @@ import java.util.*
 
 val oneDayMs = 1000*60*60*24L
 var modeShowTrashBin = false
+
 
 class ToDoActivity : Activity() {
 
@@ -97,6 +101,8 @@ class ToDoActivity : Activity() {
     private lateinit var mProgressBar: ProgressBar
 
     private lateinit var mListViewToDo: ListView
+
+    private var locationManager : LocationManager? = null
 
     /**
      * Initializes the activity
@@ -159,6 +165,9 @@ class ToDoActivity : Activity() {
             refreshItemsFromTable()
         }
 
+        // Create persistent LocationManager reference
+        locationManager = getSystemService(LOCATION_SERVICE) as LocationManager?;
+
     }
 
 
@@ -198,14 +207,32 @@ class ToDoActivity : Activity() {
                 refreshItemsFromTable()
                 mListViewToDo.setSelection(0)
             }
-            R.id.menu_loginlogout -> loginLogout()
+            R.id.menu_create_group -> {
+                try {
+                    // Request location updates
+                    locationManager?.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0L, 0f, locationListener);
+                } catch(ex: SecurityException) {
+                    Log.d("myTag", "Security Exception, no location available");
+                }
+
+            }
             R.id.menu_trashbin -> {
                 item.isChecked = !item.isChecked
                 modeShowTrashBin = item.isChecked
                 refreshItemsFromTable()
             }
+            R.id.menu_loginlogout -> loginLogout()
         }
         return true
+    }
+
+    private val locationListener: LocationListener = object : LocationListener {
+        override fun onLocationChanged(location: Location) {
+            mAddButton.text = "" + location.longitude + ":" + location.latitude
+        }
+        override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {}
+        override fun onProviderEnabled(provider: String) {}
+        override fun onProviderDisabled(provider: String) {}
     }
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
