@@ -43,6 +43,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import com.google.common.util.concurrent.*
 import com.google.common.util.concurrent.Futures.*
+import com.palomaki.familyshoppinglist.table.ToDoItem
 import java.util.*
 
 
@@ -199,12 +200,16 @@ class ToDoActivity : Activity() {
                 refreshItemsFromTable()
                 mListViewToDo.setSelection(0)
             }
-            R.id.menu_loginlogout -> loginLogout()
+            R.id.menu_create_group -> {
+
+
+            }
             R.id.menu_trashbin -> {
                 item.isChecked = !item.isChecked
                 modeShowTrashBin = item.isChecked
                 refreshItemsFromTable()
             }
+            R.id.menu_loginlogout -> loginLogout()
         }
         return true
     }

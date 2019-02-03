@@ -12,5 +12,6 @@
     <string name="send_button">Send</string>
     <string name="notification_message_hint">Enter notification</string>
     <string name="trash_bin">Show Trash Bin 24h</string>
+    <string name="create_group_text">Create group</string>
 
 </resources>

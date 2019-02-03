@@ -12,6 +12,7 @@ import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.TextView
 import android.view.inputmethod.InputMethodManager
+import com.palomaki.familyshoppinglist.table.ToDoItem
 
 
 /**
