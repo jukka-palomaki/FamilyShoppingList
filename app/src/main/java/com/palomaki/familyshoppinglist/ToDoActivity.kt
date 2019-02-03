@@ -201,7 +201,16 @@ class ToDoActivity : Activity() {
                 mListViewToDo.setSelection(0)
             }
             R.id.menu_create_group -> {
-
+                val sendIntent = Intent()
+                sendIntent.action = Intent.ACTION_SEND
+                sendIntent.putExtra(
+                        Intent.EXTRA_TEXT,
+                        getString(R.string.share_your_group_text) + " "
+                                + mClient.currentUser.userId.replace("sid:", ""))
+                sendIntent.type = "text/plain"
+                startActivity(Intent.createChooser(sendIntent, getString(R.string.share_your_group_header)))
+            }
+            R.id.menu_join_group -> {
 
             }
             R.id.menu_trashbin -> {
@@ -280,7 +289,7 @@ class ToDoActivity : Activity() {
      * The view that originated the call
      */
     fun addItem(view: View) {
-        if (mClient == null || view == null) return
+        if (mClient == null) return
 
         // Create a new item
         val item = ToDoItem()
