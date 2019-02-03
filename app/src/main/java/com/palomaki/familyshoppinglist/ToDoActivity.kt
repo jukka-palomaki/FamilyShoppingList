@@ -42,15 +42,16 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import com.google.common.util.concurrent.*
+import com.google.common.util.concurrent.Futures.*
 import java.util.*
 
 
-val oneDayMs = 1000*60*60*24L
+const val oneDayMs = 1000*60*60*24L
 var modeShowTrashBin = false
 
 class ToDoActivity : Activity() {
 
-    private val TAG = "ToDoActivity"
+    private val tag = "ToDoActivity"
 
     private val appUrl = "https://familyshoppinglist.azurewebsites.net"
 
@@ -128,7 +129,7 @@ class ToDoActivity : Activity() {
 
 
             // Load the items from the Mobile Service
-            if (mClient.getCurrentUser() != null) {
+            if (mClient.currentUser != null) {
                 refreshItemsFromTable()
             }
 
@@ -139,7 +140,7 @@ class ToDoActivity : Activity() {
         }
 
 
-        mTextNextShopItem.setOnEditorActionListener { v, actionId, event ->
+        mTextNextShopItem.setOnEditorActionListener { v, actionId, _ ->
             return@setOnEditorActionListener when (actionId) {
                 EditorInfo.IME_ACTION_DONE -> {
                     addItem(v)
@@ -212,7 +213,7 @@ class ToDoActivity : Activity() {
         val loginLogoutMenuItem = menu.findItem(R.id.menu_loginlogout)
         val refreshMenuItem = menu.findItem(R.id.menu_refresh)
         val trashMenuItem = menu.findItem(R.id.menu_trashbin)
-        if (mClient.getCurrentUser() != null) {
+        if (mClient.currentUser != null) {
             loginLogoutMenuItem.title = "Logout"
             refreshMenuItem.isEnabled = true
             trashMenuItem.isEnabled = true
@@ -243,8 +244,8 @@ class ToDoActivity : Activity() {
 
                     checkItemInTable(item)
                     runOnUiThread {
-                        toastNotify(message, true, false)
-                        Log.i(TAG, "${item.text} updated and list refreshed")
+                        toastNotify(message, long = true, useUiThread = false)
+                        Log.i(tag, "${item.text} updated and list refreshed")
                         refreshItemsFromTable()
                     }
                 } catch (e: Exception) {
@@ -274,9 +275,7 @@ class ToDoActivity : Activity() {
      * The view that originated the call
      */
     fun addItem(view: View) {
-        if (mClient == null) {
-            return
-        }
+        if (mClient == null || view == null) return
 
         // Create a new item
         val item = ToDoItem()
@@ -299,7 +298,7 @@ class ToDoActivity : Activity() {
                     runOnUiThread {
                         if (!entity.isComplete) {
                             mAdapter.add(entity)
-                            mAdapter.sort({x, y -> x.compareTo(y)})
+                            mAdapter.sort { x, y -> x.compareTo(y)}
                         }
                     }
                 } catch (e: Exception) {
@@ -367,12 +366,12 @@ class ToDoActivity : Activity() {
     @Throws(ExecutionException::class, InterruptedException::class)
     private fun refreshItemsFromMobileServiceTable(): List<ToDoItem> {
 
-        var rows = mToDoTable.where().field(completeCol).eq(`val`(false))
+        val rows = mToDoTable.where().field(completeCol).eq(`val`(false))
                     .and().field(userIdCol).eq(`val`(mClient.currentUser.userId))
                     .execute().get()
 
         if (modeShowTrashBin) {
-            var trashRows = mToDoTable.where().field(completeCol).eq(`val`(true))
+            val trashRows = mToDoTable.where().field(completeCol).eq(`val`(true))
                     .and().field(userIdCol).eq(`val`(mClient.currentUser.userId))
                     .and().field(updatedAt).ge(`val`(java.sql.Date(System.currentTimeMillis() - oneDayMs)))
                     .execute().get()
@@ -381,10 +380,9 @@ class ToDoActivity : Activity() {
             }
         }
 
-        val rowsSorted = rows.sortedBy {
+        return rows.sortedBy {
             (it.isComplete).toString() + (!it.isHighPriority).toString() + it.text.trim()
         }
-        return rowsSorted
     }
 
     /**
@@ -483,6 +481,7 @@ class ToDoActivity : Activity() {
         return task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
     }
 
+    @Suppress("UnstableApiUsage")
     private inner class ProgressFilter : ServiceFilter {
 
         override fun handleRequest(request: ServiceFilterRequest, nextServiceFilterCallback: NextServiceFilterCallback): ListenableFuture<ServiceFilterResponse> {
@@ -499,7 +498,7 @@ class ToDoActivity : Activity() {
 
             val future = nextServiceFilterCallback.onNext(request)
 
-            Futures.addCallback(future, object : FutureCallback<ServiceFilterResponse> {
+            addCallback(future, object : FutureCallback<ServiceFilterResponse> {
                 override fun onFailure(e: Throwable) {
                     resultFuture.setException(e)
                 }
@@ -526,7 +525,7 @@ class ToDoActivity : Activity() {
         }
     }
 
-    val COUNTRIES = arrayOf("")//"Belgium", "France", "Italy", "Germany", "Spain")
+    private val COUNTRIES = arrayOf("")//"Belgium", "France", "Italy", "Germany", "Spain")
 
     private fun createTable() {
 
@@ -534,8 +533,8 @@ class ToDoActivity : Activity() {
         mToDoTable = mClient.getTable(ToDoItem::class.java)
 
         mTextNextShopItem = findViewById(R.id.textNewToDo)
-        val adapter: ArrayAdapter<String> =  ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, COUNTRIES);
-        mTextNextShopItem.setAdapter(adapter);
+        val adapter: ArrayAdapter<String> =  ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, COUNTRIES)
+        mTextNextShopItem.setAdapter(adapter)
 
         // Create an adapter to bind the items with the view.
         mAdapter = ToDoItemAdapter(this, R.layout.row_list_to_do)
@@ -552,7 +551,7 @@ class ToDoActivity : Activity() {
         editor.putString(USERIDPREF, user.userId)
         userId = user.userId
         editor.putString(TOKENPREF, user.authenticationToken)
-        editor.commit()
+        editor.apply()
     }
 
     private fun loadUserTokenCache(client: MobileServiceClient?): Boolean {
@@ -568,7 +567,7 @@ class ToDoActivity : Activity() {
     }
 
 
-    fun loginLogout() {
+    private fun loginLogout() {
 
         if (!mClient.isLoginInProgress) {
             if (mAdapter.isEmpty) {
@@ -603,22 +602,21 @@ class ToDoActivity : Activity() {
     private fun setUiStatus(loggedIn: Boolean) {
         mAddButton.isEnabled = loggedIn
         mTextNextShopItem.isEnabled = loggedIn
-        if (loggedIn) {
-            mTextNextShopItem.setHint(getString(R.string.add_textbox_hint))
-        } else {
-            mTextNextShopItem.setHint(getString(R.string.logged_out_hint))
-        }
+        if (loggedIn)
+            mTextNextShopItem.hint = getString(R.string.add_textbox_hint)
+        else
+            mTextNextShopItem.hint = getString(R.string.logged_out_hint)
     }
 
     fun hideKeyboard(activity: Activity) {
         val imm = activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         //Find the currently focused view, so we can grab the correct window token from it.
-        var view: View = activity.currentFocus
+        var view = activity.currentFocus
         //If no view currently has focus, create a new one, just so we can grab a window token from it
         if (view == null) {
-            view = View(activity);
+            view = View(activity)
         }
-        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
 
@@ -652,10 +650,10 @@ class ToDoActivity : Activity() {
     companion object {
 
         // You can choose any unique number here to differentiate auth providers from each other. Note this is the same code at login() and onActivityResult().
-        val GOOGLE_LOGIN_REQUEST_CODE = 1
-        val SHAREDPREFFILE = "temp"
-        val USERIDPREF = "uid"
-        val TOKENPREF = "tkn"
+        const val GOOGLE_LOGIN_REQUEST_CODE = 1
+        const val SHAREDPREFFILE = "temp"
+        const val USERIDPREF = "uid"
+        const val TOKENPREF = "tkn"
     }
 
 }
