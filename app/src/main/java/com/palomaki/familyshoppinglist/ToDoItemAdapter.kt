@@ -17,6 +17,7 @@ import android.view.inputmethod.InputMethodManager
 /**
  * Adapter to bind a ToDoItem List to a view
  */
+@Suppress("RECEIVER_NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS", "NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
 class ToDoItemAdapter(
 
 
@@ -55,7 +56,7 @@ class ToDoItemAdapter(
         checkBox.setOnClickListener {
             checkBox.isEnabled = false
             currentItem.isComplete = !currentItem.isComplete
-            var msg : String = ""
+            var msg: String
             if (currentItem.isComplete) {
                 msg = "${currentItem.text} collected"
             } else {
@@ -98,7 +99,7 @@ class ToDoItemAdapter(
                 dialog.dismiss()
             }
 
-            editTextUpdatedText.setOnEditorActionListener { v, actionId, event ->
+            editTextUpdatedText.setOnEditorActionListener { _, actionId, _ ->
                 return@setOnEditorActionListener when (actionId) {
                     EditorInfo.IME_ACTION_DONE -> {
                         doEditActions()

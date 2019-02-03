@@ -36,11 +36,6 @@ class ToDoItem : Comparable<ToDoItem> {
     var isHighPriority: Boolean = false
 
 
-    /**
-     * ToDoItem constructor
-     */
-    constructor()
-
     override fun toString(): String {
         return text
     }
@@ -49,14 +44,12 @@ class ToDoItem : Comparable<ToDoItem> {
         return other is ToDoItem && other.id === this.id
     }
 
-    override operator fun compareTo(f: ToDoItem): Int {
-        val completed = isComplete.compareTo(f.isComplete)
-        if (completed == 0) {
-            val prio = f.isHighPriority.compareTo(isHighPriority)
-            return if (prio == 0) text.compareTo(f.text) else prio
-        } else {
-            return completed
-        }
+    override operator fun compareTo(other: ToDoItem): Int {
+        val completed = isComplete.compareTo(other.isComplete)
+        return if (completed == 0) {
+            val priority = other.isHighPriority.compareTo(isHighPriority)
+            if (priority == 0) text.compareTo(other.text) else priority
+        } else completed
     }
 
 
