@@ -13,6 +13,6 @@
     <string name="notification_message_hint">Enter notification</string>
     <string name="trash_bin">Show Trash Bin 24h</string>
     <string name="create_group_text">Send your shopping list to combine</string>
-    <string name="join_group_text">Combine your shopping list</string>
+    <string name="join_group_text">Combine your shopping list with id</string>
     <string name="share_your_group_text">You have received a group invitation (you can be only in one group at the same time). To join it, go to Family Shopping List app and menu Join Group and give this id: </string>
 </resources>
