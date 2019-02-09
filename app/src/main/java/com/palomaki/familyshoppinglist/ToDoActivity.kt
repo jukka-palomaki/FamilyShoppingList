@@ -31,6 +31,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Handler
 import android.support.v4.widget.SwipeRefreshLayout
+import android.text.Editable
 import android.util.Log
 import android.widget.*
 
@@ -211,6 +212,46 @@ class ToDoActivity : Activity() {
                 startActivity(Intent.createChooser(sendIntent, getString(R.string.create_group_text)))
             }
             R.id.menu_join_group -> {
+                val alert = AlertDialog.Builder(this)
+                val editTextCombineYourShoplistToOther = EditText(this)
+                val dialog = alert.create()
+                alert.setMessage(getString(R.string.received_id) + 1)
+                editTextCombineYourShoplistToOther.hint = getString(R.string.received_id)
+
+                editTextCombineYourShoplistToOther.imeOptions = EditorInfo.IME_ACTION_DONE
+                editTextCombineYourShoplistToOther.setSingleLine(true)
+                editTextCombineYourShoplistToOther.text = Editable.Factory.getInstance().newEditable("")
+                dialog.setView(editTextCombineYourShoplistToOther)
+                dialog.setTitle(getString(R.string.received_id_title))
+                dialog.show()
+
+                //We have to close keyboard first so that we can force it up again here
+                val activity = this as ToDoActivity
+                activity.hideKeyboard(activity)
+                editTextCombineYourShoplistToOther.requestFocus()
+                val imm = dialog.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
+
+                fun doEditActions() {
+                    val newValue = editTextCombineYourShoplistToOther.text.toString().trim()
+
+                    if (newValue.isEmpty()) { // when updated to empty text that is same as delete task
+                    }
+                    //updateData(currentItem, "")
+                    dialog.dismiss()
+                }
+
+                editTextCombineYourShoplistToOther.setOnEditorActionListener { _, actionId, _ ->
+                    return@setOnEditorActionListener when (actionId) {
+                        EditorInfo.IME_ACTION_DONE -> {
+                            doEditActions()
+                            true
+                        }
+                        else -> false
+                    }
+                }
+
+                true
 
             }
             R.id.menu_trashbin -> {
