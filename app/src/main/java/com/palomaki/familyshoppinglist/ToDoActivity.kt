@@ -208,7 +208,7 @@ class ToDoActivity : Activity() {
                         getString(R.string.share_your_group_text) + " "
                                 + mClient.currentUser.userId.replace("sid:", ""))
                 sendIntent.type = "text/plain"
-                startActivity(Intent.createChooser(sendIntent, getString(R.string.share_your_group_header)))
+                startActivity(Intent.createChooser(sendIntent, getString(R.string.create_group_text)))
             }
             R.id.menu_join_group -> {
 
