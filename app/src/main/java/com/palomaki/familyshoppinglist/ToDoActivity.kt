@@ -43,6 +43,8 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import com.google.common.util.concurrent.*
 import com.google.common.util.concurrent.Futures.*
+import java.io.PrintWriter
+import java.io.StringWriter
 import java.util.*
 
 
@@ -134,9 +136,9 @@ class ToDoActivity : Activity() {
             }
 
         } catch (e: MalformedURLException) {
-            createAndShowDialog(Exception("There was an error creating the Mobile Service. Verify the URL"), "Error")
+            createAndShowExceptionDialog(Exception("There was an error creating the Mobile Service. Verify the URL"), "Error")
         } catch (e: Exception) {
-            createAndShowDialog(e, "Error onCreate")
+            createAndShowExceptionDialog(e, "Error onCreate")
         }
 
 
@@ -154,7 +156,7 @@ class ToDoActivity : Activity() {
         mHandler = Handler()
 
         // Set an on refresh listener for swipe refresh layout
-        mSwipeLayout = findViewById(R.id.swipe_refresh_layout)
+        mSwipeLayout = this.findViewById(R.id.swipe_refresh_layout)
         mSwipeLayout.setOnRefreshListener {
             mSwipeLayout.isRefreshing  = true
             refreshItemsFromTable()
@@ -436,7 +438,7 @@ class ToDoActivity : Activity() {
      * The exception to show in the dialog
      */
     private fun createAndShowDialogFromTask(exception: Exception) {
-        runOnUiThread { createAndShowDialog(exception, "Error createAndShowDialogFromTask") }
+        runOnUiThread { createAndShowExceptionDialog(exception, "Error createAndShowDialogFromTask") }
     }
 
 
@@ -448,12 +450,19 @@ class ToDoActivity : Activity() {
      * @param title
      * The dialog title
      */
-    private fun createAndShowDialog(exception: Exception, title: String) {
+    private fun createAndShowExceptionDialog(exception: Exception, title: String) {
         var ex: Throwable = exception
         if (exception.cause != null) {
+            createAndShowDialog(ex.message!!, title)
             ex = exception.cause!!
         }
         createAndShowDialog(ex.message!!, title)
+
+        val sw = StringWriter()
+        ex.printStackTrace(PrintWriter(sw))
+        val exceptionAsString = sw.toString()
+        println(exceptionAsString)
+        createAndShowDialog(exceptionAsString, "Stack trace")
     }
 
     /**
