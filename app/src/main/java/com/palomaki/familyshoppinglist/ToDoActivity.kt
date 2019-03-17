@@ -165,9 +165,7 @@ class ToDoActivity : Activity() {
     public override fun onResume() {
         super.onResume()
         // Load the items from the Mobile Service
-        if (mClient.currentUser != null) {
-            refreshItemsFromTable()
-        }
+        refreshItemsFromTable()
 
     }
 
@@ -341,7 +339,11 @@ class ToDoActivity : Activity() {
      */
     private fun refreshItemsFromTable() {
 
-        // Get the items that weren't marked as completed and add them in the
+        if (mClient.currentUser == null) {
+            return
+        }
+
+            // Get the items that weren't marked as completed and add them in the
         // adapter
         val task = @SuppressLint("StaticFieldLeak")
         object : AsyncTask<Void, Void, Void>() {
