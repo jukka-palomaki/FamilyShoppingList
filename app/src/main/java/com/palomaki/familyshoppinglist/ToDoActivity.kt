@@ -130,10 +130,6 @@ class ToDoActivity : Activity() {
             initLocalStore().get()
 
 
-            // Load the items from the Mobile Service
-            if (mClient.currentUser != null) {
-                refreshItemsFromTable()
-            }
 
         } catch (e: MalformedURLException) {
             createAndShowExceptionDialog(Exception("There was an error creating the Mobile Service. Verify the URL"), "Error")
@@ -158,7 +154,18 @@ class ToDoActivity : Activity() {
         // Set an on refresh listener for swipe refresh layout
         mSwipeLayout = this.findViewById(R.id.swipe_refresh_layout)
         mSwipeLayout.setOnRefreshListener {
-            mSwipeLayout.isRefreshing  = true
+            if (mClient.currentUser != null) {
+                mSwipeLayout.isRefreshing = true
+                refreshItemsFromTable()
+            }
+        }
+
+    }
+
+    public override fun onResume() {
+        super.onResume()
+        // Load the items from the Mobile Service
+        if (mClient.currentUser != null) {
             refreshItemsFromTable()
         }
 
