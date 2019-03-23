@@ -43,6 +43,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import com.google.common.util.concurrent.*
 import com.google.common.util.concurrent.Futures.*
+import com.microsoft.windowsazure.mobileservices.MobileServiceException
 import java.io.PrintWriter
 import java.io.StringWriter
 import java.util.*
@@ -255,6 +256,10 @@ class ToDoActivity : Activity() {
                         Log.i(tag, "${item.text} updated and list refreshed")
                         refreshItemsFromTable()
                     }
+                } catch (e: MobileServiceException) {
+                    Log.e(tag, "updateItem", e)
+                    finish()
+                    startActivity(intent)
                 } catch (e: Exception) {
                     createAndShowDialogFromTask(e)
                 }
@@ -301,13 +306,16 @@ class ToDoActivity : Activity() {
             override fun doInBackground(vararg params: Void): Void? {
                 try {
                     val entity = addItemInTable(item)
-
                     runOnUiThread {
                         if (!entity.isComplete) {
                             mAdapter.add(entity)
                             mAdapter.sort { x, y -> x.compareTo(y)}
                         }
                     }
+                } catch (e: MobileServiceException) {
+                    Log.e(tag, "addItem", e)
+                    finish()
+                    startActivity(intent)
                 } catch (e: Exception) {
                     createAndShowDialogFromTask(e)
                 }
@@ -359,6 +367,10 @@ class ToDoActivity : Activity() {
                             mAdapter.add(item)
                         }
                     }
+                } catch (e: MobileServiceException) {
+                    Log.e(tag, "refreshItemsFromTable", e)
+                    finish()
+                    startActivity(intent)
                 } catch (e: Exception) {
                     createAndShowDialogFromTask(e)
                 }
@@ -429,6 +441,10 @@ class ToDoActivity : Activity() {
 
                     syncContext.initialize(localStore, handler).get()
 
+                } catch (e: MobileServiceException) {
+                    Log.e(tag, "initLocalStore", e)
+                    finish()
+                    startActivity(intent)
                 } catch (e: Exception) {
                     createAndShowDialogFromTask(e)
                 }
