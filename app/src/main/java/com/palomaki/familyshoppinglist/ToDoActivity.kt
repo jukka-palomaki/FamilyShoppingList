@@ -261,7 +261,11 @@ class ToDoActivity : Activity() {
                     finish()
                     startActivity(intent)
                 } catch (e: Exception) {
-                    createAndShowDialogFromTask(e)
+                    Log.e(tag, "updateItem", e)
+                    finish()
+                    startActivity(intent)
+
+                    //createAndShowDialogFromTask(e)
                 }
                 return null
             }
@@ -317,7 +321,10 @@ class ToDoActivity : Activity() {
                     finish()
                     startActivity(intent)
                 } catch (e: Exception) {
-                    createAndShowDialogFromTask(e)
+                    Log.e(tag, "addItem", e)
+                    finish()
+                    startActivity(intent)
+                    //createAndShowDialogFromTask(e)
                 }
 
                 return null
@@ -372,7 +379,10 @@ class ToDoActivity : Activity() {
                     finish()
                     startActivity(intent)
                 } catch (e: Exception) {
-                    createAndShowDialogFromTask(e)
+                    Log.e(tag, "refreshItemsFromTable", e)
+                    finish()
+                    startActivity(intent)
+                    //createAndShowDialogFromTask(e)
                 }
 
                 return null
@@ -446,7 +456,10 @@ class ToDoActivity : Activity() {
                     finish()
                     startActivity(intent)
                 } catch (e: Exception) {
-                    createAndShowDialogFromTask(e)
+                    Log.e(tag, "initLocalStore", e)
+                    finish()
+                    startActivity(intent)
+                    //createAndShowDialogFromTask(e)
                 }
 
                 return null
@@ -517,43 +530,55 @@ class ToDoActivity : Activity() {
 
     @Suppress("UnstableApiUsage")
     private inner class ProgressFilter : ServiceFilter {
+        lateinit var resultFuture: SettableFuture<ServiceFilterResponse>
 
         override fun handleRequest(request: ServiceFilterRequest, nextServiceFilterCallback: NextServiceFilterCallback): ListenableFuture<ServiceFilterResponse> {
+            try {
 
-            val resultFuture = SettableFuture.create<ServiceFilterResponse>()
+                resultFuture = SettableFuture.create<ServiceFilterResponse>()
 
 
-            runOnUiThread {
+                runOnUiThread {
 
-                 if (!mSwipeLayout.isRefreshing) {
-                     mProgressBar.visibility = View.VISIBLE
-                 }
-            }
-
-            val future = nextServiceFilterCallback.onNext(request)
-
-            addCallback(future, object : FutureCallback<ServiceFilterResponse> {
-                override fun onFailure(e: Throwable) {
-                    resultFuture.setException(e)
+                     if (!mSwipeLayout.isRefreshing) {
+                         mProgressBar.visibility = View.VISIBLE
+                     }
                 }
 
-                override fun onSuccess(response: ServiceFilterResponse?) {
-                    runOnUiThread {
-                        mRunnable = Runnable {
-                            // Update the text view text with a random number
 
-                            // Hide swipe to refresh icon animation
-                            mSwipeLayout.isRefreshing  = false
-                            mProgressBar.visibility = View.INVISIBLE
-                        }
+                val future = nextServiceFilterCallback.onNext(request)
 
-                        // Execute the task after specified time
-                        mHandler.postDelayed(mRunnable, refreshDelay)
+                addCallback(future, object : FutureCallback<ServiceFilterResponse> {
+                    override fun onFailure(e: Throwable) {
+                        resultFuture.setException(e)
                     }
 
-                    resultFuture.set(response)
-                }
-            }, MoreExecutors.directExecutor())
+                    override fun onSuccess(response: ServiceFilterResponse?) {
+                        runOnUiThread {
+                            mRunnable = Runnable {
+                                // Update the text view text with a random number
+
+                                // Hide swipe to refresh icon animation
+                                mSwipeLayout.isRefreshing = false
+                                mProgressBar.visibility = View.INVISIBLE
+                            }
+
+                            // Execute the task after specified time
+                            mHandler.postDelayed(mRunnable, refreshDelay)
+                        }
+
+                        resultFuture.set(response)
+                    }
+                }, MoreExecutors.directExecutor())
+            } catch (ex: MobileServiceException) {
+                Log.e(tag, "handleRequest", ex)
+                finish()
+                startActivity(intent)
+            } catch (ex: Exception) {
+                Log.e(tag, "handleRequest", ex)
+                finish()
+                startActivity(intent)
+            }
 
             return resultFuture
         }
