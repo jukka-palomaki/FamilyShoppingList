@@ -204,6 +204,7 @@ class ToDoActivity : Activity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId) {
             R.id.menu_refresh -> {
+                mProgressBar.visibility = View.VISIBLE
                 refreshItemsFromTable()
                 mListViewToDo.setSelection(0)
             }
@@ -496,11 +497,11 @@ class ToDoActivity : Activity() {
         }
         createAndShowDialog(ex.message!!, title)
 
-        val sw = StringWriter()
+        /*val sw = StringWriter()
         ex.printStackTrace(PrintWriter(sw))
         val exceptionAsString = sw.toString()
         println(exceptionAsString)
-        createAndShowDialog(exceptionAsString, "Stack trace")
+        createAndShowDialog(ex.localizedMessage, "Stack trace")*/
     }
 
     /**
@@ -540,7 +541,7 @@ class ToDoActivity : Activity() {
 
                 runOnUiThread {
 
-                     if (!mSwipeLayout.isRefreshing) {
+                     if (!mSwipeLayout.isRefreshing && mAdapter.isEmpty) {
                          mProgressBar.visibility = View.VISIBLE
                      }
                 }
