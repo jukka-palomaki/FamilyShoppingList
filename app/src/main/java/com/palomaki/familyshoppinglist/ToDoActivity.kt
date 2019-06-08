@@ -29,6 +29,8 @@ import com.microsoft.windowsazure.mobileservices.table.query.QueryOperations.*
 
 import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
+import android.net.NetworkInfo
 import android.os.Handler
 import android.support.v4.widget.SwipeRefreshLayout
 import android.util.Log
@@ -115,6 +117,14 @@ class ToDoActivity : Activity() {
         mTextNextShopItem = findViewById(R.id.textNewToDo)
         mListViewToDo = findViewById(R.id.listViewToDo)
 
+        if (!isNetworkAvailable()) {
+            createAndShowDialog(
+                    getString(R.string.error_no_network),
+                    getString(R.string.error_dialog_title)
+            )
+            return
+        }
+
         try {
 
             // Extend timeout from default of 10s to 20s
@@ -128,12 +138,16 @@ class ToDoActivity : Activity() {
             authenticate()
 
             //Init local storage
-            initLocalStore().get()
+            if (!isNetworkAvailable()) {
+                initLocalStore().get()
+            }
 
 
 
         } catch (e: MalformedURLException) {
-            createAndShowExceptionDialog(Exception("There was an error creating the Mobile Service. Verify the URL"), "Error")
+            createAndShowExceptionDialog(
+                    Exception("There was an error creating the Mobile Service. Verify the URL."),
+                    getString(R.string.error_dialog_title))
         } catch (e: Exception) {
             createAndShowExceptionDialog(e, "Error onCreate")
         }
@@ -246,28 +260,32 @@ class ToDoActivity : Activity() {
             return
         }
 
+        if (!isNetworkAvailable()) {
+            createAndShowDialog(
+                    getString(R.string.error_no_network),
+                    getString(R.string.error_dialog_title)
+            )
+            return
+        }
+
         val task = @SuppressLint("StaticFieldLeak")
+
         object : AsyncTask<Void, Void, Void>() {
             override fun doInBackground(vararg params: Void): Void? {
-                try {
 
-                    checkItemInTable(item)
-                    runOnUiThread {
-                        toastNotify(message, long = true, useUiThread = false)
-                        Log.i(tag, "${item.text} updated and list refreshed")
-                        refreshItemsFromTable()
+                    try {
+
+                        checkItemInTable(item)
+                        runOnUiThread {
+                            toastNotify(message, long = true, useUiThread = false)
+                            Log.i(tag, "${item.text} updated and list refreshed")
+                            refreshItemsFromTable()
+                        }
+                    } catch (e: MobileServiceException) {
+                        Log.e(tag, "updateItem", e)
+                    } catch (e: Exception) {
+                        Log.e(tag, "updateItem", e)
                     }
-                } catch (e: MobileServiceException) {
-                    Log.e(tag, "updateItem", e)
-                    finish()
-                    startActivity(intent)
-                } catch (e: Exception) {
-                    Log.e(tag, "updateItem", e)
-                    finish()
-                    startActivity(intent)
-
-                    //createAndShowDialogFromTask(e)
-                }
                 return null
             }
         }
@@ -294,12 +312,23 @@ class ToDoActivity : Activity() {
     fun addItem(view: View) {
         if (mClient == null || view == null) return
 
+        if (!isNetworkAvailable()) {
+            createAndShowDialog(
+                    getString(R.string.error_no_network),
+                    getString(R.string.error_dialog_title)
+            )
+            return
+        }
+
         // Create a new item
         val item = ToDoItem()
 
         item.text = mTextNextShopItem.text.toString()
         if (item.text.trim().isEmpty()) {
-            createAndShowDialog("Cannot add empty item","Error")
+            createAndShowDialog(
+                    getString(R.string.error_empty_item),
+                    getString(R.string.error_dialog_title)
+            )
             return
         }
         item.isComplete = false
@@ -319,15 +348,9 @@ class ToDoActivity : Activity() {
                     }
                 } catch (e: MobileServiceException) {
                     Log.e(tag, "addItem", e)
-                    finish()
-                    startActivity(intent)
                 } catch (e: Exception) {
                     Log.e(tag, "addItem", e)
-                    finish()
-                    startActivity(intent)
-                    //createAndShowDialogFromTask(e)
                 }
-
                 return null
             }
         }
@@ -364,7 +387,6 @@ class ToDoActivity : Activity() {
         val task = @SuppressLint("StaticFieldLeak")
         object : AsyncTask<Void, Void, Void>() {
             override fun doInBackground(vararg params: Void): Void? {
-
                 try {
                     val results = refreshItemsFromMobileServiceTable()
 
@@ -377,13 +399,8 @@ class ToDoActivity : Activity() {
                     }
                 } catch (e: MobileServiceException) {
                     Log.e(tag, "refreshItemsFromTable", e)
-                    finish()
-                    startActivity(intent)
                 } catch (e: Exception) {
                     Log.e(tag, "refreshItemsFromTable", e)
-                    finish()
-                    startActivity(intent)
-                    //createAndShowDialogFromTask(e)
                 }
 
                 return null
@@ -432,35 +449,37 @@ class ToDoActivity : Activity() {
         val task = @SuppressLint("StaticFieldLeak")
         object : AsyncTask<Void, Void, Void>() {
             override fun doInBackground(vararg params: Void): Void? {
-                try {
+                if (isNetworkAvailable()) {
+                    try {
 
-                    val syncContext = mClient.syncContext
+                        val syncContext = mClient.syncContext
 
-                    if (syncContext.isInitialized)
-                        return null
+                        if (syncContext.isInitialized)
+                            return null
 
-                    val localStore = SQLiteLocalStore(mClient.context, "OfflineStore", null, 1)
+                        val localStore = SQLiteLocalStore(mClient.context, "OfflineStore", null, 1)
 
-                    val tableDefinition = HashMap<String, ColumnDataType>()
-                    tableDefinition[idCol] = ColumnDataType.String
-                    tableDefinition[textCol] = ColumnDataType.String
-                    tableDefinition[completeCol] = ColumnDataType.Boolean
+                        val tableDefinition = HashMap<String, ColumnDataType>()
+                        tableDefinition[idCol] = ColumnDataType.String
+                        tableDefinition[textCol] = ColumnDataType.String
+                        tableDefinition[completeCol] = ColumnDataType.Boolean
 
-                    localStore.defineTable("ToDoItem", tableDefinition)
+                        localStore.defineTable("ToDoItem", tableDefinition)
 
-                    val handler = SimpleSyncHandler()
+                        val handler = SimpleSyncHandler()
 
-                    syncContext.initialize(localStore, handler).get()
+                        syncContext.initialize(localStore, handler).get()
 
-                } catch (e: MobileServiceException) {
-                    Log.e(tag, "initLocalStore", e)
-                    finish()
-                    startActivity(intent)
-                } catch (e: Exception) {
-                    Log.e(tag, "initLocalStore", e)
-                    finish()
-                    startActivity(intent)
-                    //createAndShowDialogFromTask(e)
+                    } catch (e: MobileServiceException) {
+                        Log.e(tag, "initLocalStore", e)
+                    } catch (e: Exception) {
+                        Log.e(tag, "initLocalStore", e)
+                    }
+                } else {
+                    createAndShowDialog(
+                            getString(R.string.error_no_network),
+                            getString(R.string.error_dialog_title)
+                    )
                 }
 
                 return null
@@ -573,12 +592,8 @@ class ToDoActivity : Activity() {
                 }, MoreExecutors.directExecutor())
             } catch (ex: MobileServiceException) {
                 Log.e(tag, "handleRequest", ex)
-                finish()
-                startActivity(intent)
             } catch (ex: Exception) {
                 Log.e(tag, "handleRequest", ex)
-                finish()
-                startActivity(intent)
             }
 
             return resultFuture
@@ -699,11 +714,19 @@ class ToDoActivity : Activity() {
                     if (errorMessage == null) {
                         errorMessage = "Not allowed user"
                     }
-                    createAndShowDialog(errorMessage, "Error")
+                    createAndShowDialog(errorMessage, getString(R.string.error_dialog_title))
                     setUiStatus(false)
                 }
             }
         }
+    }
+
+    private fun isNetworkAvailable(): Boolean {
+        val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE)
+        return if (connectivityManager is ConnectivityManager) {
+            val networkInfo: NetworkInfo? = connectivityManager.activeNetworkInfo
+            networkInfo?.isConnected ?: false
+        } else false
     }
 
     
