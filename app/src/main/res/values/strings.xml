@@ -12,5 +12,9 @@
     <string name="send_button">Send</string>
     <string name="notification_message_hint">Enter notification</string>
     <string name="trash_bin">Show Trash Bin 24h</string>
+    <string name="error_dialog_title">Error</string>
+    <string name="error_no_network">No network available</string>
+    <string name="error_empty_item">Cannot add empty item"</string>
+
 
 </resources>
