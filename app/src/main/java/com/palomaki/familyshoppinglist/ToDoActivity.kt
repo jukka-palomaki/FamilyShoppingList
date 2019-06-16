@@ -46,6 +46,7 @@ import android.widget.Toast
 import com.google.common.util.concurrent.*
 import com.google.common.util.concurrent.Futures.*
 import com.microsoft.windowsazure.mobileservices.MobileServiceException
+import org.jetbrains.anko.startActivity
 import java.io.PrintWriter
 import java.io.StringWriter
 import java.util.*
@@ -382,8 +383,7 @@ class ToDoActivity : Activity() {
             return
         }
 
-            // Get the items that weren't marked as completed and add them in the
-        // adapter
+        // Get the items that weren't marked as completed and add them in the adapter
         val task = @SuppressLint("StaticFieldLeak")
         object : AsyncTask<Void, Void, Void>() {
             override fun doInBackground(vararg params: Void): Void? {
@@ -399,6 +399,19 @@ class ToDoActivity : Activity() {
                     }
                 } catch (e: MobileServiceException) {
                     Log.e(tag, "refreshItemsFromTable", e)
+
+                    val sw = StringWriter()
+                    e.printStackTrace(PrintWriter(sw))
+                    val exceptionAsString = sw.toString()
+                    println(exceptionAsString)
+                    if (sw.toString().contains("timeout")) {
+                        runOnUiThread {
+                            createAndShowDialog("Screen will be recreated due to timeout", "Info")
+                            finish()
+                            startActivity(intent)
+                        }
+                    }
+
                 } catch (e: Exception) {
                     Log.e(tag, "refreshItemsFromTable", e)
                 }
@@ -408,6 +421,7 @@ class ToDoActivity : Activity() {
         }
 
         runAsyncTask(task)
+
     }
 
 
