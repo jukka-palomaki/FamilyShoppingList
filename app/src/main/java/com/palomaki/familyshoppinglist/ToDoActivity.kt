@@ -102,7 +102,7 @@ class ToDoActivity : Activity() {
 
     private lateinit var mListViewToDo: ListView
 
-    private var mLastResumeTime = System.currentTimeMillis()
+    private var mLastStartTime = System.currentTimeMillis()
     private val recreateTimeMinutes = 5
 
     /**
@@ -178,19 +178,26 @@ class ToDoActivity : Activity() {
 
     }
 
-    public override fun onResume() {
-        super.onResume()
+    public override fun onStart() {
+        super.onStart()
         // Load the items from the Mobile Service
 
         val currentTime = System.currentTimeMillis()
 
-        if (currentTime - mLastResumeTime > recreateTimeMinutes * 1000 * 60) {
+        if (currentTime - mLastStartTime > recreateTimeMinutes * 1000 * 60) {
             finish()
             startActivity(intent)
         } else {
-            refreshItemsFromTable()
-            mLastResumeTime = currentTime
+            mLastStartTime = currentTime
         }
+    }
+
+
+    public override fun onResume() {
+        super.onResume()
+
+        // Load the items from the Mobile Service
+        refreshItemsFromTable()
 
     }
 
