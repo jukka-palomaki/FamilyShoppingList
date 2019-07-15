@@ -46,8 +46,6 @@ import android.widget.Toast
 import com.google.common.util.concurrent.*
 import com.google.common.util.concurrent.Futures.*
 import com.microsoft.windowsazure.mobileservices.MobileServiceException
-import java.io.PrintWriter
-import java.io.StringWriter
 import java.util.*
 
 
@@ -103,6 +101,9 @@ class ToDoActivity : Activity() {
     private lateinit var mProgressBar: ProgressBar
 
     private lateinit var mListViewToDo: ListView
+
+    private var mLastResumeTime = System.currentTimeMillis()
+    private val recreateTimeMinutes = 5
 
     /**
      * Initializes the activity
@@ -180,7 +181,16 @@ class ToDoActivity : Activity() {
     public override fun onResume() {
         super.onResume()
         // Load the items from the Mobile Service
-        refreshItemsFromTable()
+
+        val currentTime = System.currentTimeMillis()
+
+        if (currentTime - mLastResumeTime > recreateTimeMinutes * 1000 * 60) {
+            finish()
+            startActivity(intent)
+        } else {
+            refreshItemsFromTable()
+            mLastResumeTime = currentTime
+        }
 
     }
 
