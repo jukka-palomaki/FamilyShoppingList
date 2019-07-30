@@ -203,7 +203,7 @@ class ToDoActivity : Activity() {
         stoppedTime = System.currentTimeMillis()
 
         // Delay 7 min
-        val delay = 1000 * 60 * 7L
+        val delay = 1000 * 60 * 15L
         Handler().postDelayed(r, delay)
 
     }
