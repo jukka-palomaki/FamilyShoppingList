@@ -46,8 +46,6 @@ import android.widget.Toast
 import com.google.common.util.concurrent.*
 import com.google.common.util.concurrent.Futures.*
 import com.microsoft.windowsazure.mobileservices.MobileServiceException
-import java.io.PrintWriter
-import java.io.StringWriter
 import java.util.*
 
 
@@ -103,6 +101,8 @@ class ToDoActivity : Activity() {
     private lateinit var mProgressBar: ProgressBar
 
     private lateinit var mListViewToDo: ListView
+
+    private var stoppedTime = 0L
 
     /**
      * Initializes the activity
@@ -182,8 +182,31 @@ class ToDoActivity : Activity() {
         // Load the items from the Mobile Service
         refreshItemsFromTable()
 
+        stoppedTime = 0L
+
     }
 
+    public override fun onStop() {
+        super.onStop()
+
+
+        val r = Runnable {
+            if (stoppedTime > 0) {
+                /*
+                 * close the activity in the background because of Azure connection
+                 * can get broken
+                 */
+                finishAffinity()
+            }
+        }
+
+        stoppedTime = System.currentTimeMillis()
+
+        // Delay 7 min
+        val delay = 1000 * 60 * 15L
+        Handler().postDelayed(r, delay)
+
+    }
 
     fun toastNotify(notificationMessage: String, long: Boolean, useUiThread: Boolean = true) {
         if (useUiThread) {
