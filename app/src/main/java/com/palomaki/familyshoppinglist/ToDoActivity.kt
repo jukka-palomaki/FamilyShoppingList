@@ -56,7 +56,7 @@ class ToDoActivity : Activity() {
 
     private val tag = "ToDoActivity"
 
-    private val appUrl = "https://familyshoppinglist.azurewebsites.net"
+    private val appUrl = "https://fashli.azurewebsites.net"
 
     private val completeCol = "complete"
     private val textCol = "text"
