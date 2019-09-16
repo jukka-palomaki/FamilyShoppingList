@@ -46,6 +46,9 @@ import android.widget.Toast
 import com.google.common.util.concurrent.*
 import com.google.common.util.concurrent.Futures.*
 import com.microsoft.windowsazure.mobileservices.MobileServiceException
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.util.*
 
 
@@ -343,6 +346,11 @@ class ToDoActivity : Activity() {
             return
         }
 
+        GlobalScope.launch {
+            delay(1000)
+            createAndShowDialogFromTask(Exception("moro"))
+        }
+
         // Create a new item
         val item = ToDoItem()
 
@@ -454,6 +462,7 @@ class ToDoActivity : Activity() {
             }
         }
 
+
         return rows.sortedBy {
             (it.isComplete).toString() + (!it.isHighPriority).toString() + it.text.trim()
         }
@@ -518,9 +527,12 @@ class ToDoActivity : Activity() {
      * @param exception
      * The exception to show in the dialog
      */
-    private fun createAndShowDialogFromTask(exception: Exception) {
+    suspend private fun createAndShowDialogFromTask(exception: Exception) {
         runOnUiThread { createAndShowExceptionDialog(exception, "Error createAndShowDialogFromTask") }
     }
+
+
+
 
 
     /**
@@ -538,6 +550,8 @@ class ToDoActivity : Activity() {
             ex = exception.cause!!
         }
         createAndShowDialog(ex.message!!, title)
+
+
 
         /*val sw = StringWriter()
         ex.printStackTrace(PrintWriter(sw))
