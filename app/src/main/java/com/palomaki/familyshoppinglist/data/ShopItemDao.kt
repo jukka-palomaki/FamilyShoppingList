@@ -3,7 +3,7 @@ package fi.jukka.mvvmbasicstut.data
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 
-class FakeQuoteDao {
+class ShopItemDao {
     // A fake database table
     private val quoteList = mutableListOf<Quote>()
     // MutableLiveData is from the Architecture Components Library

@@ -4,7 +4,7 @@ package fi.jukka.mvvmbasicstut.data
 class FakeDatabase private constructor() {
 
     // All the DAOs go here!
-    var quoteDao = FakeQuoteDao()
+    var quoteDao = ShopItemDao()
         private set
 
     companion object {

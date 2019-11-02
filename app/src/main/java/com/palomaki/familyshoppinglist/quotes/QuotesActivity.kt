@@ -5,7 +5,6 @@ import android.os.Bundle
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.palomaki.familyshoppinglist.R
-import fi.jukka.mvvmbasicstut.data.Quote
 import fi.jukka.mvvmbasicstut.utilities.InjectorUtils
 //import kotlinx.android.synthetic.main.activity_quotes.*
 
@@ -18,14 +17,14 @@ class QuotesActivity : AppCompatActivity() {
     }
 
     private fun initializeUi() {
-        // Get the QuotesViewModelFactory with all of it's dependencies constructed
+        // Get the ShopItemViewModelFactory with all of it's dependencies constructed
         val factory = InjectorUtils.provideQuotesViewModelFactory()
-        // Use ViewModelProviders class to create / get already created QuotesViewModel
+        // Use ViewModelProviders class to create / get already created ShopItemViewModel
         // for this view (activity)
         val viewModel = ViewModelProviders.of(this, factory)
-            .get(QuotesViewModel::class.java)
+            .get(ShopItemViewModel::class.java)
 
-        // Observing LiveData from the QuotesViewModel which in turn observes
+        // Observing LiveData from the ShopItemViewModel which in turn observes
         // LiveData from the repository, which observes LiveData from the DAO ☺
         viewModel.getQuotes().observe(this, Observer { quotes ->
             val stringBuilder = StringBuilder()
