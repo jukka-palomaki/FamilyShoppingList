@@ -342,19 +342,18 @@ class ToDoActivity : Activity() {
             return
         }
 
-        // Create a new item
-        val item = ToDoItem()
+        val shopListText = mTextNextShopItem.text.toString().trim()
 
-        item.text = mTextNextShopItem.text.toString()
-        if (item.text.trim().isEmpty()) {
+        if (shopListText.isEmpty()) {
             createAndShowDialog(
                     getString(R.string.error_empty_item),
                     getString(R.string.error_dialog_title)
             )
             return
         }
-        item.isComplete = false
-        item.userId = userId
+
+        // Create a new item
+        val item = ToDoItem(shopListText, false, userId)
 
         // Insert the new item
         val task = @SuppressLint("StaticFieldLeak")
