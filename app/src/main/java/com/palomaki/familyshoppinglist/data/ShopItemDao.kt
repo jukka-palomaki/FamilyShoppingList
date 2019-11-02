@@ -5,26 +5,26 @@ import androidx.lifecycle.MutableLiveData
 
 class ShopItemDao {
     // A fake database table
-    private val quoteList = mutableListOf<Quote>()
+    private val shopItemList = mutableListOf<Quote>()
     // MutableLiveData is from the Architecture Components Library
     // LiveData can be observed for changes
-    private val quotes = MutableLiveData<List<Quote>>()
+    private val shopItems = MutableLiveData<List<Quote>>()
 
     init {
-        // Immediately connect the now empty quoteList
+        // Immediately connect the now empty shopItemList
         // to the MutableLiveData which can be observed
-        quotes.value = quoteList
+        shopItems.value = shopItemList
     }
 
     fun addShopItem(quote: Quote) {
-        quoteList.add(quote)
+        shopItemList.add(quote)
         // After adding a quote to the "database",
         // update the value of MutableLiveData
         // which will notify its active observers
-        quotes.value = quoteList
+        shopItems.value = shopItemList
     }
 
     // Casting MutableLiveData to LiveData because its value
     // shouldn't be changed from other classes
-    fun getShopItems() = quotes as LiveData<List<Quote>>
+    fun getShopItems() = shopItems as LiveData<List<Quote>>
 }
