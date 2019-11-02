@@ -26,7 +26,7 @@ class QuotesActivity : AppCompatActivity() {
 
         // Observing LiveData from the ShopItemViewModel which in turn observes
         // LiveData from the repository, which observes LiveData from the DAO ☺
-        viewModel.getQuotes().observe(this, Observer { quotes ->
+        viewModel.getShopItem().observe(this, Observer { quotes ->
             val stringBuilder = StringBuilder()
             quotes.forEach { quote ->
                 stringBuilder.append("$quote\n\n")
@@ -37,7 +37,7 @@ class QuotesActivity : AppCompatActivity() {
         // When button is clicked, instantiate a Quote and add it to DB through the ViewModel
         /*button_add_quote.setOnClickListener {
             val quote = Quote(editText_quote.text.toString(), editText_author.text.toString())
-            viewModel.addQuote(quote)
+            viewModel.addShopItem(quote)
             editText_quote.setText("")
             editText_author.setText("")
         }*/

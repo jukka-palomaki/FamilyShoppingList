@@ -11,7 +11,7 @@ object InjectorUtils {
     fun provideQuotesViewModelFactory(): ShopItemViewModelFactory {
         // ViewModelFactory needs a repository, which in turn needs a DAO from a database
         // The whole dependency tree is constructed right here, in one place
-        val quoteRepository = ShopItemRepository.getInstance(FakeDatabase.getInstance().quoteDao)
-        return ShopItemViewModelFactory(quoteRepository)
+        val shopItemRepository = ShopItemRepository.getInstance(FakeDatabase.getInstance().quoteDao)
+        return ShopItemViewModelFactory(shopItemRepository)
     }
 }

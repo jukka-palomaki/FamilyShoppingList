@@ -9,7 +9,7 @@ import fi.jukka.mvvmbasicstut.data.ShopItemRepository
 class ShopItemViewModel(private val shopItemRepository: ShopItemRepository)
     : ViewModel() {
 
-    fun getQuotes() = shopItemRepository.getQuotes()
+    fun getShopItem() = shopItemRepository.getShopItems()
 
-    fun addQuote(quote: Quote) = shopItemRepository.addQuote(quote)
+    fun addShopItem(quote: Quote) = shopItemRepository.addShopItem(quote)
 }

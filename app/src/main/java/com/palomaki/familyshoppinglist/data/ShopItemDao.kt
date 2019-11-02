@@ -16,7 +16,7 @@ class ShopItemDao {
         quotes.value = quoteList
     }
 
-    fun addQuote(quote: Quote) {
+    fun addShopItem(quote: Quote) {
         quoteList.add(quote)
         // After adding a quote to the "database",
         // update the value of MutableLiveData
@@ -26,5 +26,5 @@ class ShopItemDao {
 
     // Casting MutableLiveData to LiveData because its value
     // shouldn't be changed from other classes
-    fun getQuotes() = quotes as LiveData<List<Quote>>
+    fun getShopItems() = quotes as LiveData<List<Quote>>
 }
