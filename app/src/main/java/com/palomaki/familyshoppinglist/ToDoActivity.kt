@@ -32,7 +32,6 @@ import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
 import android.os.Handler
-import android.support.v4.widget.SwipeRefreshLayout
 import android.util.Log
 import android.widget.*
 
@@ -86,7 +85,7 @@ class ToDoActivity : Activity() {
 
     private lateinit var mTextNextShopItem: AutoCompleteTextView
 
-    private lateinit var mSwipeLayout: SwipeRefreshLayout
+    //private lateinit var mSwipeLayout: SwipeRefreshLayout
 
     private lateinit var mAddButton: Button
 
@@ -167,13 +166,13 @@ class ToDoActivity : Activity() {
         mHandler = Handler()
 
         // Set an on refresh listener for swipe refresh layout
-        mSwipeLayout = this.findViewById(R.id.swipe_refresh_layout)
+        /*mSwipeLayout = this.findViewById(R.id.swipe_refresh_layout)
         mSwipeLayout.setOnRefreshListener {
             if (mClient.currentUser != null) {
                 mSwipeLayout.isRefreshing = true
                 refreshItemsFromTable()
             }
-        }
+        }*/
 
     }
 
@@ -343,19 +342,18 @@ class ToDoActivity : Activity() {
             return
         }
 
-        // Create a new item
-        val item = ToDoItem()
+        val shopListText = mTextNextShopItem.text.toString().trim()
 
-        item.text = mTextNextShopItem.text.toString()
-        if (item.text.trim().isEmpty()) {
+        if (shopListText.isEmpty()) {
             createAndShowDialog(
                     getString(R.string.error_empty_item),
                     getString(R.string.error_dialog_title)
             )
             return
         }
-        item.isComplete = false
-        item.userId = userId
+
+        // Create a new item
+        val item = ToDoItem(shopListText, false, userId)
 
         // Insert the new item
         val task = @SuppressLint("StaticFieldLeak")
@@ -580,13 +578,14 @@ class ToDoActivity : Activity() {
 
                 resultFuture = SettableFuture.create<ServiceFilterResponse>()
 
-
+                /*
                 runOnUiThread {
 
                      if (!mSwipeLayout.isRefreshing && mAdapter.isEmpty) {
                          mProgressBar.visibility = View.VISIBLE
                      }
                 }
+                */
 
 
                 val future = nextServiceFilterCallback.onNext(request)
@@ -602,7 +601,7 @@ class ToDoActivity : Activity() {
                                 // Update the text view text with a random number
 
                                 // Hide swipe to refresh icon animation
-                                mSwipeLayout.isRefreshing = false
+                                //mSwipeLayout.isRefreshing = false
                                 mProgressBar.visibility = View.INVISIBLE
                             }
 
