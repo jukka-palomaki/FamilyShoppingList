@@ -356,7 +356,7 @@ class ToDoActivity : Activity() {
         }
         item.isComplete = false
         item.userId = userId
-        item.isHighPriority = item.text.startsWith('!') || item.text.endsWith('!')
+        item.isHighPriority = item.text.endsWith('!')
 
         // Insert the new item
         val task = @SuppressLint("StaticFieldLeak")
