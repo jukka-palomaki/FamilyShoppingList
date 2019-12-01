@@ -32,7 +32,7 @@ import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
 import android.os.Handler
-import android.support.v4.widget.SwipeRefreshLayout
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import android.util.Log
 import android.widget.*
 
@@ -86,7 +86,7 @@ class ToDoActivity : Activity() {
 
     private lateinit var mTextNextShopItem: AutoCompleteTextView
 
-    private lateinit var mSwipeLayout: SwipeRefreshLayout
+    private lateinit var mSwipeLayout: androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 
     private lateinit var mAddButton: Button
 
