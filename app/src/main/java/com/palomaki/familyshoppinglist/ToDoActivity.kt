@@ -24,7 +24,6 @@ import com.microsoft.windowsazure.mobileservices.table.sync.localstore.ColumnDat
 import com.microsoft.windowsazure.mobileservices.table.sync.localstore.MobileServiceLocalStoreException
 import com.microsoft.windowsazure.mobileservices.table.sync.localstore.SQLiteLocalStore
 import com.microsoft.windowsazure.mobileservices.table.sync.synchandler.SimpleSyncHandler
-import com.squareup.okhttp.OkHttpClient
 import com.microsoft.windowsazure.mobileservices.table.query.QueryOperations.*
 
 import android.content.Context
@@ -46,6 +45,7 @@ import android.widget.Toast
 import com.google.common.util.concurrent.*
 import com.google.common.util.concurrent.Futures.*
 import com.microsoft.windowsazure.mobileservices.MobileServiceException
+import okhttp3.OkHttpClient
 import java.util.*
 
 
@@ -130,8 +130,8 @@ class ToDoActivity : Activity() {
             // Extend timeout from default of 10s to 20s
             mClient.setAndroidHttpClientFactory {
                 val client = OkHttpClient()
-                client.setReadTimeout(20, TimeUnit.SECONDS)
-                client.setWriteTimeout(20, TimeUnit.SECONDS)
+                //client.setReadTimeout(20, TimeUnit.SECONDS)
+                //client.setWriteTimeout(20, TimeUnit.SECONDS)
                 client
             }
 
