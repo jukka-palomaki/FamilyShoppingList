@@ -356,9 +356,15 @@ class ToDoActivity : Activity() {
         }
         item.isComplete = false
         item.userId = userId
-        item.isHighPriority = item.text.endsWith('!')
-        if (item.isHighPriority) {
-            item.text = item.text.removeSuffix("!")
+
+        /*
+         * Automatically make shopping item to be high priority when its
+         * last character is "!"
+         */
+        val prioritySuffix = "!"
+        if (item.text.endsWith(prioritySuffix)) {
+            item.isHighPriority = true
+            item.text = item.text.removeSuffix(prioritySuffix)
         }
 
         // Insert the new item
