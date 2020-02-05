@@ -47,6 +47,7 @@ import com.google.common.util.concurrent.*
 import com.google.common.util.concurrent.Futures.*
 import com.microsoft.windowsazure.mobileservices.MobileServiceException
 import java.util.*
+import kotlin.concurrent.timerTask
 
 
 const val oneDayMs = 1000*60*60*24L
@@ -101,8 +102,6 @@ class ToDoActivity : Activity() {
     private lateinit var mProgressBar: ProgressBar
 
     private lateinit var mListViewToDo: ListView
-
-    private var stoppedTime = 0L
 
     /**
      * Initializes the activity
@@ -175,37 +174,29 @@ class ToDoActivity : Activity() {
             }
         }
 
+        /*
+         * Refresh the list regularly after some time from the start because my
+         * cheap Azure App Service (low service level)
+         * is going down so quickly and can cause start time of minutes otherwise.
+         */
+        val refreshRate = 1000 * 60 * 7L // seven minutes in milliseconds
+        Timer().scheduleAtFixedRate(timerTask {
+            refreshItemsFromTable()
+            Log.i(tag, "Auto refresh done")
+        }, refreshRate, refreshRate)
+
     }
 
     public override fun onResume() {
         super.onResume()
-        // Load the items from the Mobile Service
+
+        // Load the items from the Mobile Service.
         refreshItemsFromTable()
-
-        stoppedTime = 0L
-
     }
+
 
     public override fun onStop() {
         super.onStop()
-
-
-        val r = Runnable {
-            if (stoppedTime > 0) {
-                /*
-                 * close the activity in the background because of Azure connection
-                 * can get broken
-                 */
-                finishAffinity()
-            }
-        }
-
-        stoppedTime = System.currentTimeMillis()
-
-        // Delay 7 min
-        val delay = 1000 * 60 * 15L
-        Handler().postDelayed(r, delay)
-
     }
 
     fun toastNotify(notificationMessage: String, long: Boolean, useUiThread: Boolean = true) {
