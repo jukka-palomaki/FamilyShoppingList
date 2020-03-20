@@ -350,13 +350,9 @@ class ToDoActivity : Activity() {
 
         /*
          * Automatically make shopping item to be high priority when its
-         * last character is "!"
+         * last character is "!" or "."
          */
-        val prioritySuffix = "!"
-        if (item.text.endsWith(prioritySuffix)) {
-            item.isHighPriority = true
-            item.text = item.text.removeSuffix(prioritySuffix)
-        }
+        immediatePriorityWhenAdding(item, arrayOf("!", "."))
 
         // Insert the new item
         val task = @SuppressLint("StaticFieldLeak")
@@ -384,7 +380,15 @@ class ToDoActivity : Activity() {
         mTextNextShopItem.setText("")
     }
 
-
+    private fun immediatePriorityWhenAdding(item: ToDoItem, prioritySuffixes: Array<String>) {
+        for (prioritySuffix in prioritySuffixes) {
+            if (item.text.endsWith(prioritySuffix)) {
+                item.isHighPriority = true
+                item.text = item.text.removeSuffix(prioritySuffix)
+                return
+            }
+        }
+    }
 
     /**
      * Add an item to the Mobile Service Table
